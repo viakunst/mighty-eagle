@@ -1,0 +1,16 @@
+.profile.card {
+    border-radius:.25rem;
+    background:#fbfbfb;
+    box-shadow:0 0 2rem grey;
+    overflow:hidden;
+    max-width:30rem;
+    margin:2.75rem auto;
+    padding:1.375rem;
+    text-align:center
+}
+
+.profile.card .form,
+.profile.card .table {
+    text-align:left
+}
+   
