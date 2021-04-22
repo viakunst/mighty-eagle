@@ -2,17 +2,17 @@ import React, { useContext } from "react";
 import { Link } from 'react-router-dom';
 import { UserData } from "react-oidc";
 import '../style/Profile.css';
+import attributeConfig from '../../config/attributeConfig';
 import userManager from "../services/userManager";
 
 export default function Profile() {
   const userData = useContext(UserData);
-
-  const generateRow = (text, field) => (
-    <tr>
-      <th>{ text }</th>
-      <td>{ userData?.user.profile[field] }</td>
-    </tr>
-  );
+  
+  // Render all attributes
+  let rows = [];
+  for (const { view } of attributeConfig) {
+    rows.push(view(userData));
+  }
 
   return (
     <div className="profile card row">
@@ -20,13 +20,12 @@ export default function Profile() {
       <div className="table">
         <table>
           <tbody>
-            { generateRow('Naam', 'name' ) }
-            { generateRow('E-mail', 'email' ) }
+            { rows }
           </tbody>
         </table>
       </div>
       <br />
-      <Link to="/edit">Gegevens bewerken</Link> | <a href="#" onClick={() => userManager.signoutRedirect()}>Uitloggen</a>
+      <Link to="/edit">Gegevens bewerken</Link> | <button onClick={() => userManager.signoutRedirect()}>Uitloggen</button>
   </div>
   );
 }
