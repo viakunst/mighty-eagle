@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Link } from 'react-router-dom';
 import { UserData } from "react-oidc";
 import '../style/Profile.css';
-import attributeConfig from '../../config/attributeConfig';
+import attributeConfig from '../config/attributeConfig';
 import userManager from "../services/userManager";
 
 export default function Profile() {

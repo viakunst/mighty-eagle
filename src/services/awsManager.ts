@@ -1,9 +1,9 @@
-import awsConfig from './awsConfig';
+import awsConfig from '../config/awsConfig';
 import { CognitoIdentityProviderClient, UpdateUserAttributesCommand } from "@aws-sdk/client-cognito-identity-provider";
 
 const awsManager = {
   client: new CognitoIdentityProviderClient(awsConfig),
-  update: function(userData, dict) { // async?
+  update: async function(userData:any, dict:any) { // async?
     // Map dict to objects for command
     var attributes = [];
     for (var key in dict){

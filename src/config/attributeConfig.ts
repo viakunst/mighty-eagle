@@ -1,4 +1,4 @@
-import { TextAttribute, BooleanAttribute } from '../src/attributes';
+import { TextAttribute, BooleanAttribute } from '../attributes';
 
 const attributeConfig = [
   TextAttribute({

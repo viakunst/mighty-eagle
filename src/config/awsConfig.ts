@@ -1,5 +1,5 @@
 const awsConfig = {
-  region: 'eu-west-1',
+  region: 'eu-west-2',
 };
 
 export default awsConfig;

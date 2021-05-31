@@ -2,15 +2,15 @@ import { WebStorageStateStore, Log } from "oidc-client";
 
 const userManagerConfig = {
   metadata: {
-    'issuer': "https://localhost:4000",
-    'authorization_endpoint': "http://localhost:4000/authorize",
+    'issuer': "http://localhost:3000/token",
+    'authorization_endpoint': "https://localhost:3000/token",
     'token_endpoint': "http://localhost:4000/token",
     'userinfo_endpoint': "http://localhost:4000/api/userinfo",
     'jwks_uri': "http://localhost:4000/.well-known/jwks.json",
   },
   signinKeys: [],
 	authority: 'https://localhost:4000',
-  client_id: "profilepage",
+  client_id: "profile-test",
   scope: 'openid profile email',
   response_type: 'code',
 	userStore: new WebStorageStateStore({ store: window.localStorage }),

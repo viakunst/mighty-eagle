@@ -1,8 +1,9 @@
 import { Field, ErrorMessage } from 'formik';
 
-export default function BooleanAttribute({ Name, Attribute }) {
+export default function BooleanAttribute({ Name, Attribute, Description }:any) {
   return {
-    view: (userData) => (
+    attribute: Attribute,
+    view: (userData:any) => (
       <tr>
         <th>{ Name }</th>
         <td>{ userData?.user.profile[Attribute] }</td>
@@ -14,6 +15,6 @@ export default function BooleanAttribute({ Name, Attribute }) {
         <ErrorMessage name={Name} component="div" />
       </>
     ),
-    validate: (value) => { }
+    validate: (value:any) => { }
   }
 }

@@ -1,9 +1,9 @@
 import { Field, ErrorMessage } from 'formik';
 
-export default function TextAttribute({ Name, Attribute }) {
+export default function TextAttribute({ Name, Attribute, Description }:any) {
   return {
     attribute: Attribute,
-    view: (userData) => (
+    view: (userData:any) => (
       <tr>
         <th>{ Name }</th>
         <td>{ userData?.user.profile[Attribute] }</td>
@@ -15,6 +15,6 @@ export default function TextAttribute({ Name, Attribute }) {
         <ErrorMessage name={Name} component="div" />
       </>
     ),
-    validate: (value) => { }
+    validate: (value:any) => { }
   }
 }
