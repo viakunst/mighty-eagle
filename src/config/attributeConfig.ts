@@ -1,6 +1,8 @@
 import { TextAttribute, BooleanAttribute } from '../attributes';
 
 const attributeConfig = [
+  // Name is the attribute primary key.
+  // These need to be unique for each attribute therefore.
   TextAttribute({
     Name: 'E-mail',
     Attribute: 'email',
