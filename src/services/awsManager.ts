@@ -3,6 +3,7 @@ import awsConfig from '../config/awsConfig';
 
 const awsManager = {
   client: new CognitoIdentityProviderClient(awsConfig),
+
   update: async function getUserData(userData: any, dict: any) {
     // async?
     // Map dict to objects for command
@@ -24,6 +25,7 @@ const awsManager = {
 
     return this.client.send(command);
   },
+
 };
 
 export default awsManager;

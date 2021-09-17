@@ -1,0 +1,16 @@
+.admin.card {
+    border-radius:.25rem;
+    background:#fbfbfb;
+    box-shadow:0 0 2rem grey;
+    overflow:hidden;
+    max-width:90rem;
+    margin:2.75rem auto;
+    padding:1.375rem;
+    text-align:center
+}
+
+.admin.card .form,
+.admin.card .table {
+    text-align:left
+}
+   

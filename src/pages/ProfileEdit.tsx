@@ -9,7 +9,6 @@ import awsManager from '../services/awsManager';
 
 export default function ProfileEdit() {
   const userData = useContext(UserData);
-
   // Render all attributes
   const rows: any[] = [];
 
