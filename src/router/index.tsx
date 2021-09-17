@@ -1,8 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { makeAuthenticator, Callback } from 'react-oidc';
+import Cognito from '../services/cognito';
 import Profile from '../pages/Profile';
 import ProfileEdit from '../pages/ProfileEdit';
+import ProfileAdmin from '../pages/ProfileAdmin';
 import Error404 from '../pages/Error404';
 import userManager from '../services/userManager';
 
@@ -27,6 +29,9 @@ export default function App() {
                 }
 
                 console.log('succes');
+
+                // Instantly identify the user in the identity pool and request credentials.
+                Cognito.signIn(user.id_token);
                 // `user.state` will reflect the state that was passed in via signinArgs.
                 routeProps.history.push('/');
               }}
@@ -38,6 +43,7 @@ export default function App() {
           )}
         />
         <Route path="/edit" exact component={WithAuth(ProfileEdit)} />
+        <Route path="/admin" exact component={WithAuth(ProfileAdmin)} />
         <Route path="/" exact component={WithAuth(Profile)} />
         <Route path="/" component={Error404} />
       </Switch>
