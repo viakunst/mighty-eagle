@@ -23,6 +23,8 @@ export default function App() {
           path="/callback"
           render={(routeProps) => (
             <Callback
+              // sign in succes.
+              // Do after sign-in function here.
               onSuccess={(user) => {
                 if (user.state != null) {
                   //  placeholder

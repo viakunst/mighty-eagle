@@ -13,6 +13,7 @@ export default class AdminMenu extends Component<{}, { admin: string }> {
   }
 
   async componentDidMount() {
+    // TO-DO: check if Cognito has his credentials.
     Cognito.getRole().then((value) => {
       this.setState({ admin: value });
     }).catch((err) => console.log('ERROR', err));

@@ -17,7 +17,7 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 
 import { ColumnsType } from 'antd/lib/table';
-import UserDetails from './UserAttributes';
+import UserForm from './UserForm';
 import Cognito from '../../services/cognito';
 
 const { Option } = Select;
@@ -38,7 +38,7 @@ interface UserPoolState {
   attributes: any | undefined,
   searchAttribute: string | null,
   activeUserPool: string | null,
-  modalVisible: boolean,
+  userSelected: boolean,
   selectedUser: UserType | null,
 }
 
@@ -51,7 +51,7 @@ export class UserPool extends Component<{}, UserPoolState> {
       attributes: ['name', 'email'],
       searchAttribute: '',
       activeUserPool: null,
-      modalVisible: false,
+      userSelected: false,
       selectedUser: null,
     };
   }
@@ -136,9 +136,15 @@ export class UserPool extends Component<{}, UserPoolState> {
         UserPoolId: activeUserPool ?? undefined,
         Username: username,
       }));
+      console.log(response);
+
+      const tempuser:UserType = response;
+      tempuser.Attributes = response.UserAttributes;
+      console.log(tempuser);
+
       this.setState({
-        selectedUser: response,
-        modalVisible: true,
+        selectedUser: tempuser,
+        userSelected: true,
       });
     } catch (err) {
       console.log("Can't get user: ", err);
@@ -147,7 +153,7 @@ export class UserPool extends Component<{}, UserPoolState> {
 
   closeModal = () => {
     this.setState({
-      modalVisible: false,
+      userSelected: false,
     });
   };
 
@@ -155,7 +161,7 @@ export class UserPool extends Component<{}, UserPoolState> {
     const { activeUserPool } = this.state;
     const users = await this.fetchUsers(activeUserPool);
     this.setState({
-      modalVisible: false,
+      userSelected: false,
       users,
     });
   };
@@ -209,26 +215,31 @@ export class UserPool extends Component<{}, UserPoolState> {
         title: 'Action',
         key: 'action',
         render: (text, record) => (
-          <span>
-            <Icon
-              onClick={(e) => this.openModal(e.nativeEvent, record.username)}
-              style={{ fontSize: 21, color: '#08c' }}
-              type="edit"
-            />
-            <Divider type="vertical" />
-            <Icon
-              onClick={() => {
-                this.setEnabled(record.username, record.enabled !== 'enabled');
-              }}
-              style={{ fontSize: 21 }}
-              type={record.enabled === 'enabled' ? 'lock' : 'unlock'}
-            />
-          </span>
+          <>
+            <span>
+              <button type="button" onClick={(e) => this.openModal(e.nativeEvent, record.username)}> details</button>
+            </span>
+            <span>
+              <Icon
+                onClick={(e) => this.openModal(e.nativeEvent, record.username)}
+                style={{ fontSize: 21, color: '#888' }}
+                type="edit"
+              />
+              <Divider type="vertical" />
+              <Icon
+                onClick={() => {
+                  this.setEnabled(record.username, record.enabled !== 'enabled');
+                }}
+                style={{ fontSize: 21 }}
+                type={record.enabled === 'enabled' ? 'lock' : 'unlock'}
+              />
+            </span>
+          </>
         ),
       },
     ];
     const {
-      pools, attributes, users, selectedUser, modalVisible, activeUserPool,
+      pools, attributes, users, selectedUser, userSelected, activeUserPool,
     } = this.state;
     return (
       <div>
@@ -270,11 +281,11 @@ export class UserPool extends Component<{}, UserPoolState> {
           <Modal
             title={selectedUser ? selectedUser.Username : ''}
             destroyOnClose
-            visible={modalVisible}
+            visible={userSelected}
             onCancel={this.closeModal}
             footer={null}
           >
-            <UserDetails
+            <UserForm
               userPoolId={activeUserPool}
               user={selectedUser}
               onAttributesUpdate={this.onAttributesUpdate}
