@@ -17,7 +17,7 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 
 import { ColumnsType } from 'antd/lib/table';
-import UserForm from './UserForm';
+import UserEditForm from '../cred/UserEditForm';
 import Cognito from '../../services/cognito';
 
 const { Option } = Select;
@@ -285,7 +285,7 @@ export class UserPool extends Component<{}, UserPoolState> {
             onCancel={this.closeModal}
             footer={null}
           >
-            <UserForm
+            <UserEditForm
               userPoolId={activeUserPool}
               user={selectedUser}
               onAttributesUpdate={this.onAttributesUpdate}

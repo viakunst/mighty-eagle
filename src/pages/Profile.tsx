@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { UserData } from 'react-oidc';
 import '../style/Profile.css';
 import attributeConfig from '../config/attributeConfig';
-import userManager from '../services/userManager';
 import AdminMenu from '../components/admin-button/AdminMenu';
+import SignOutButton from '../components/admin-button/SignOutButton';
 
 export default function Profile() {
   const userData = useContext(UserData);
@@ -27,7 +27,7 @@ export default function Profile() {
       <br />
       <AdminMenu />
       <Link to="/edit">Gegevens bewerken</Link> |{' '}
-      <button type="button" onClick={() => userManager.signoutRedirect()}>Uitloggen</button>
+      <SignOutButton />
     </div>
   );
 }

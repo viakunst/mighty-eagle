@@ -1,13 +1,10 @@
 import React from 'react';
 
 import {
-  Button, Divider, Form, Input, message,
+  Button, Divider, Form, message,
 } from 'antd';
 
-import uniqby from 'lodash/uniqBy';
-
-import { AdminUpdateUserAttributesCommand, AttributeType, UserType } from '@aws-sdk/client-cognito-identity-provider';
-import { cognitoAttributes } from '../../config/helpers';
+import { AdminDeleteUserCommand, AttributeType, UserType } from '@aws-sdk/client-cognito-identity-provider';
 import Cognito from '../../services/cognito';
 
 interface UserAttributesProps {
@@ -27,7 +24,7 @@ const formItemLayout = {
   },
 };
 
-const UserForm = (props:UserAttributesProps) => {
+const UserDelete = (props:UserAttributesProps) => {
   const [form] = Form.useForm();
 
   const {
@@ -42,8 +39,6 @@ const UserForm = (props:UserAttributesProps) => {
     attributes = user.Attributes;
   }
 
-  const combined = uniqby([...attributes, ...cognitoAttributes], 'Name');
-
   const onFinish = () => {
     const userAttributes: AttributeType[] = [];
     const formData = form.getFieldsValue();
@@ -51,27 +46,11 @@ const UserForm = (props:UserAttributesProps) => {
     console.log(form.getFieldValue(['attributes', 'email']));
     console.log(form.getFieldValue('attributes[email]'));
 
-    attributes.forEach((at) => {
-      if (at.Name) {
-        const attribute = {
-          Name: at.Name,
-          Value: form.getFieldValue(`attributes[${at.Name}]`),
-        };
-        console.log(attribute);
-        if (at.Name === 'sub' || at.Name === 'updated_at') {
-          // command
-        } else {
-          userAttributes.push(attribute);
-        }
-      }
-    });
-
     console.log(userAttributes);
 
-    Cognito.client().send(new AdminUpdateUserAttributesCommand({
+    Cognito.client().send(new AdminDeleteUserCommand({
       UserPoolId: userPoolId ?? undefined,
       Username: user?.Username ?? '',
-      UserAttributes: userAttributes,
     }))
       .then(() => {
         message.info('UserAttributes is successfully updated!');
@@ -85,27 +64,9 @@ const UserForm = (props:UserAttributesProps) => {
 
   console.log(attributes);
 
-  const formItems = combined.map((attribute:any) => {
-    if (attribute.Name === 'sub') {
-      return (<></>);
-    }
-    return (
-      <Form.Item
-        label={attribute.Name}
-        required={false}
-        key={attribute.Name}
-        name={`attributes[${attribute.Name}]`}
-        initialValue={attribute.Value}
-        validateTrigger={['onChange', 'onBlur']}
-        rules={[{
-          required: false,
-          whitespace: true,
-        }]}
-      >
-        <Input style={{ width: '60%', marginRight: 8 }} />
-      </Form.Item>
-    );
-  });
+  const formItems = (
+    <></>
+  );
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
@@ -131,4 +92,4 @@ const UserForm = (props:UserAttributesProps) => {
   );
 };
 
-export default UserForm;
+export default UserDelete;
