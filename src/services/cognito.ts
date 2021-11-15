@@ -35,6 +35,14 @@ export default class Cognito {
     });
   }
 
+  static saveIdToken(IdToken: string) {
+    localStorage.setItem('id_token', JSON.stringify(IdToken));
+  }
+
+  static getIdToken(): string | undefined {
+    return JSON.parse(localStorage.getItem('id_token') ?? 'undefined');
+  }
+
   // Handles the getId protocol and the getCredentialsForIdentiry protocol.
   static async signIn(IdToken: string | undefined): Promise<string> {
     try {

@@ -1,5 +1,4 @@
-import React, { Component, useContext } from 'react';
-import { UserData } from 'react-oidc';
+import React, { Component } from 'react';
 import userManagerConfig from '../../config/userManagerConfig';
 
 class SignOutButton extends Component<{}, {}> {
@@ -19,12 +18,10 @@ class SignOutButton extends Component<{}, {}> {
     window.location.assign(requestUri);
   }
 
+  // WARNING: completely clears local storage (of this site).
   static signOut() {
-    const userData = useContext(UserData);
-    if (userData.userManager !== null) {
-      userData.userManager.removeUser();
-      SignOutButton.signOutRedirect();
-    }
+    SignOutButton.signOutRedirect();
+    localStorage.clear();
   }
 
   render() {

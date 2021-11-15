@@ -33,7 +33,7 @@ export default function App() {
                 console.log('succes');
 
                 // Instantly identify the user in the identity pool and request credentials.
-                Cognito.signIn(user.id_token);
+                Cognito.saveIdToken(user.id_token);
                 // `user.state` will reflect the state that was passed in via signinArgs.
                 routeProps.history.push('/');
               }}
