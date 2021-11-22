@@ -19,6 +19,7 @@ class SignOutButton extends Component<{}, {}> {
   }
 
   // WARNING: completely clears local storage (of this site).
+  // This shouldn't pose a problem since you are already logging out.
   static signOut() {
     SignOutButton.signOutRedirect();
     localStorage.clear();
