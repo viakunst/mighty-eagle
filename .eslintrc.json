@@ -1,9 +1,13 @@
 {
-    "extends": [ "airbnb-typescript" ],
+    "extends": [
+        "airbnb-typescript",
+        "plugin:sonarjs/recommended"
+    ],
     "parserOptions": {
         "project": "./tsconfig.json"
     },
     "rules": {
         "react/jsx-one-expression-per-line": "off"
-    }
+    },
+    "plugins": ["sonarjs"]
 }

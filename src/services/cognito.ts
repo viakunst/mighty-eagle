@@ -72,15 +72,12 @@ export default class Cognito {
     const response = await sts.send(stsCommand);
     if (response.Arn) {
       const roleArray = response.Arn.split('/');
-      switch (roleArray[1]) {
-        case 'CognitoPowerUser':
-          return 'admin';
-        default:
-          return 'user';
+      if (roleArray[1] === 'CognitoPowerUser') {
+        return 'admin';
       }
-    } else {
-      return 'failure';
+      return 'user';
     }
+    return 'failure';
   }
 
   static signOut() {
