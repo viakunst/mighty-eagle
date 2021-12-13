@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {
-  Divider, Table,
+  Table,
 } from 'antd';
 
 import { AttributeType, UserType } from '@aws-sdk/client-cognito-identity-provider';
@@ -28,12 +28,12 @@ const UserReadForm = (props:UserAttributesProps) => {
 
   const columns = [
     {
-      title: 'Name',
+      title: 'Veld',
       dataIndex: 'key',
       key: 'name',
     },
     {
-      title: 'Age',
+      title: 'Waarde',
       dataIndex: 'value',
       key: 'age',
     },
@@ -51,8 +51,6 @@ const UserReadForm = (props:UserAttributesProps) => {
   // Add delete, edit, cancel button.
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-      <h2>Update User Attributes</h2>
-      <Divider />
       <Table dataSource={columnData} columns={columns} />
     </div>
   );

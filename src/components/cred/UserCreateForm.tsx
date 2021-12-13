@@ -1,18 +1,15 @@
 import React from 'react';
 
 import {
-  Button, Divider, Form, Input, message,
+  Button, Form, Input, message,
 } from 'antd';
 
-import uniqby from 'lodash/uniqBy';
-
 import { AdminCreateUserCommand, AttributeType } from '@aws-sdk/client-cognito-identity-provider';
-import { cognitoAttributes } from '../../config/helpers';
 import Cognito from '../../services/cognito';
+import { cognitoAttributes } from '../../config/helpers';
 
 interface UserAttributesProps {
   userPoolId: string | null;
-  attributes: AttributeType[];
   onAttributesUpdate: () => Promise<void>;
 }
 
@@ -31,10 +28,8 @@ const UserCreateForm = (props:UserAttributesProps) => {
   const [form] = Form.useForm();
 
   const {
-    userPoolId, attributes, onAttributesUpdate,
+    userPoolId, onAttributesUpdate,
   } = props;
-
-  const combined = uniqby([...attributes, ...cognitoAttributes], 'Name');
 
   const onFinish = () => {
     const userAttributes: AttributeType[] = [];
@@ -43,18 +38,14 @@ const UserCreateForm = (props:UserAttributesProps) => {
     console.log(form.getFieldValue(['attributes', 'email']));
     console.log(form.getFieldValue('attributes[email]'));
 
-    attributes.forEach((at) => {
-      if (at.Name) {
-        const attribute = {
-          Name: at.Name,
-          Value: form.getFieldValue(`attributes[${at.Name}]`),
+    cognitoAttributes.forEach((attribute1) => {
+      if (attribute1.Name) {
+        const attribute:AttributeType = {
+          Name: attribute1.Name,
+          Value: form.getFieldValue(`attributes[${attribute1.Name}]`),
         };
         console.log(attribute);
-        if (at.Name === 'sub' || at.Name === 'updated_at') {
-          // command
-        } else {
-          userAttributes.push(attribute);
-        }
+        userAttributes.push(attribute);
       }
     });
 
@@ -77,34 +68,25 @@ const UserCreateForm = (props:UserAttributesProps) => {
       });
   };
 
-  console.log(attributes);
-
-  const formItems = combined.map((attribute:any) => {
-    if (attribute.Name === 'sub') {
-      return (<></>);
-    }
-    return (
-      <Form.Item
-        label={attribute.Name}
-        required={false}
-        key={attribute.Name}
-        name={`attributes[${attribute.Name}]`}
-        initialValue={attribute.Value}
-        validateTrigger={['onChange', 'onBlur']}
-        rules={[{
-          required: false,
-          whitespace: true,
-        }]}
-      >
-        <Input style={{ width: '60%', marginRight: 8 }} />
-      </Form.Item>
-    );
-  });
+  const formItems = cognitoAttributes.map((field:any) => (
+    <Form.Item
+      label={field.Name}
+      required={false}
+      key={field.Name}
+      name={`attributes[${field.Name}]`}
+      initialValue={field.Name}
+      validateTrigger={['onChange', 'onBlur']}
+      rules={[{
+        required: false,
+        whitespace: true,
+      }]}
+    >
+      <Input style={{ width: '60%', marginRight: 8 }} />
+    </Form.Item>
+  ));
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-      <h2>Create User</h2>
-      <Divider />
       <Form
         labelCol={formItemLayout?.labelCol}
         wrapperCol={formItemLayout?.wrapperCol}

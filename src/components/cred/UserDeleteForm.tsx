@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {
-  Button, Divider, Form, message,
+  Button, Form, message, Checkbox,
 } from 'antd';
 
 import { AdminDeleteUserCommand, AttributeType, UserType } from '@aws-sdk/client-cognito-identity-provider';
@@ -24,7 +24,7 @@ const formItemLayout = {
   },
 };
 
-const UserDelete = (props:UserAttributesProps) => {
+const UserDeleteForm = (props:UserAttributesProps) => {
   const [form] = Form.useForm();
 
   const {
@@ -39,57 +39,49 @@ const UserDelete = (props:UserAttributesProps) => {
     attributes = user.Attributes;
   }
 
-  const onFinish = () => {
-    const userAttributes: AttributeType[] = [];
-    const formData = form.getFieldsValue();
-    console.log(formData);
-    console.log(form.getFieldValue(['attributes', 'email']));
-    console.log(form.getFieldValue('attributes[email]'));
-
-    console.log(userAttributes);
-
-    Cognito.client().send(new AdminDeleteUserCommand({
-      UserPoolId: userPoolId ?? undefined,
-      Username: user?.Username ?? '',
-    }))
-      .then(() => {
+  const onFinish = async () => {
+    console.log(form.getFieldValue('sure'));
+    const check = form.getFieldValue('sure');
+    if (check === 'test') {
+      try {
+        await Cognito.client().send(new AdminDeleteUserCommand({
+          UserPoolId: userPoolId ?? undefined,
+          Username: user?.Username ?? '',
+        }));
         message.info('UserAttributes is successfully updated!');
         onAttributesUpdate();
-      })
-      .catch((e) => {
+      } catch (e) {
         message.info("Can't update user!");
         console.log(e);
-      });
+      }
+    }
   };
 
   console.log(attributes);
 
   const formItems = (
-    <></>
+    <>
+      <Form.Item name="sure" valuePropName="checked" noStyle>
+        <Checkbox>Ja, ik wil dit account echt verwijderen.</Checkbox>
+      </Form.Item>
+    </>
   );
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-      <h2>Update User Attributes</h2>
-      <Divider />
+      Pas op dit is permanent.
       <Form
         labelCol={formItemLayout?.labelCol}
         wrapperCol={formItemLayout?.wrapperCol}
         form={form}
         onFinish={onFinish}
-        initialValues={{ userAttr: user?.Attributes }}
+        initialValues={{ sure: false }}
       >
         {formItems}
-        <Form.Item wrapperCol={{
-          xs: { span: 24, offset: 0 },
-          sm: { span: 20, offset: 4 },
-        }}
-        >
-          <Button type="primary" htmlType="submit">Update</Button>
-        </Form.Item>
+        <Button type="primary" htmlType="submit">Verwijder account.</Button>
       </Form>
     </div>
   );
 };
 
-export default UserDelete;
+export default UserDeleteForm;

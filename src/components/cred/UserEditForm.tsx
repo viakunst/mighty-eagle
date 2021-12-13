@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {
-  Button, Divider, Form, Input, message,
+  Button, Form, Input, message,
 } from 'antd';
 
 import uniqby from 'lodash/uniqBy';
@@ -44,13 +44,12 @@ const UserEditForm = (props:UserAttributesProps) => {
 
   const combined = uniqby([...attributes, ...cognitoAttributes], 'Name');
 
-  const onFinish = () => {
+  const onFinish = async () => {
     const userAttributes: AttributeType[] = [];
     const formData = form.getFieldsValue();
     console.log(formData);
     console.log(form.getFieldValue(['attributes', 'email']));
     console.log(form.getFieldValue('attributes[email]'));
-
     attributes.forEach((at) => {
       if (at.Name) {
         const attribute = {
@@ -67,20 +66,18 @@ const UserEditForm = (props:UserAttributesProps) => {
     });
 
     console.log(userAttributes);
-
-    Cognito.client().send(new AdminUpdateUserAttributesCommand({
-      UserPoolId: userPoolId ?? undefined,
-      Username: user?.Username ?? '',
-      UserAttributes: userAttributes,
-    }))
-      .then(() => {
-        message.info('UserAttributes is successfully updated!');
-        onAttributesUpdate();
-      })
-      .catch((e) => {
-        message.info("Can't update user!");
-        console.log(e);
-      });
+    try {
+      await Cognito.client().send(new AdminUpdateUserAttributesCommand({
+        UserPoolId: userPoolId ?? undefined,
+        Username: user?.Username ?? '',
+        UserAttributes: userAttributes,
+      }));
+      message.info('UserAttributes is successfully updated!');
+      onAttributesUpdate();
+    } catch (e) {
+      message.info("Can't update user!");
+      console.log(e);
+    }
   };
 
   console.log(attributes);
@@ -109,8 +106,6 @@ const UserEditForm = (props:UserAttributesProps) => {
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-      <h2>Update User Attributes</h2>
-      <Divider />
       <Form
         labelCol={formItemLayout?.labelCol}
         wrapperCol={formItemLayout?.wrapperCol}

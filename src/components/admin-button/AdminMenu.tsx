@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 
 import { Link } from 'react-router-dom';
+import {
+  Button,
+} from 'antd';
 
 import Cognito from '../../services/cognito';
 
@@ -28,7 +31,11 @@ export default class AdminMenu extends Component<{}, { admin: string }> {
     if (admin === 'admin') {
       return (
         <>
-          <Link to="/admin">Beheer</Link> | {' '}
+          <Link to="/admin">
+            <Button>
+              Beheer
+            </Button>
+          </Link> | {' '}
         </>
       );
     }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import {
-  Divider, Modal, Select, Table, Input,
+  Divider, Modal, Select, Table, Input, Button,
 } from 'antd';
 
 import Icon from '@ant-design/icons';
@@ -17,7 +18,7 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 
 import { ColumnsType } from 'antd/lib/table';
-import UserEditForm from '../cred/UserEditForm';
+import UserCRUD from '../admin-button/UserCRUD';
 import Cognito from '../../services/cognito';
 
 const { Option } = Select;
@@ -40,6 +41,7 @@ interface UserPoolState {
   activeUserPool: string | null,
   userSelected: boolean,
   selectedUser: UserType | null,
+  modelTitle: String,
 }
 
 export class UserPool extends Component<{}, UserPoolState> {
@@ -53,6 +55,7 @@ export class UserPool extends Component<{}, UserPoolState> {
       activeUserPool: null,
       userSelected: false,
       selectedUser: null,
+      modelTitle: 'Account bekijken.',
     };
   }
 
@@ -129,31 +132,49 @@ export class UserPool extends Component<{}, UserPoolState> {
   };
 
   openModal = async (e: MouseEvent, username: string) => {
+    const {
+      activeUserPool,
+    } = this.state;
     e.preventDefault();
-    try {
-      const { activeUserPool } = this.state;
-      const response = await Cognito.client().send(new AdminGetUserCommand({
-        UserPoolId: activeUserPool ?? undefined,
-        Username: username,
-      }));
-      console.log(response);
+    if (username === 'create-user') {
+      if (activeUserPool) {
+        this.setState({
+          selectedUser: null,
+          userSelected: true,
+        });
+      }
+    } else {
+      try {
+        const response = await Cognito.client().send(new AdminGetUserCommand({
+          UserPoolId: activeUserPool ?? undefined,
+          Username: username,
+        }));
+        console.log(response);
 
-      const tempuser:UserType = response;
-      tempuser.Attributes = response.UserAttributes;
-      console.log(tempuser);
+        const tempuser:UserType = response;
+        tempuser.Attributes = response.UserAttributes;
+        console.log(tempuser);
 
-      this.setState({
-        selectedUser: tempuser,
-        userSelected: true,
-      });
-    } catch (err) {
-      console.log("Can't get user: ", err);
+        this.setState({
+          selectedUser: tempuser,
+          userSelected: true,
+        });
+      } catch (err) {
+        console.log("Can't get user: ", err);
+      }
     }
   };
 
   closeModal = () => {
     this.setState({
       userSelected: false,
+      modelTitle: 'Gebruiker bekijken.',
+    });
+  };
+
+  updateModalTitle = (str:String) => {
+    this.setState({
+      modelTitle: str,
     });
   };
 
@@ -262,7 +283,7 @@ export class UserPool extends Component<{}, UserPoolState> {
       },
     ];
     const {
-      pools, attributes, users, selectedUser, userSelected, activeUserPool,
+      pools, attributes, users, selectedUser, userSelected, activeUserPool, modelTitle,
     } = this.state;
     return (
       <div>
@@ -297,21 +318,31 @@ export class UserPool extends Component<{}, UserPoolState> {
               ))}
             </Select>
             <Search placeholder="input search text" allowClear onSearch={this.onSearch} style={{ width: 200 }} />
+            <Button type="primary" onClick={(e) => this.openModal(e.nativeEvent, 'create-user')}>
+              Maak account aan.
+            </Button>
+
+            <Link to="/">
+              <Button>
+                Annuleren
+              </Button>
+            </Link>
           </div>
 
           <Table pagination={false} columns={columns} dataSource={users} />
 
           <Modal
-            title={selectedUser ? selectedUser.Username : ''}
+            title={modelTitle}
             destroyOnClose
             visible={userSelected}
             onCancel={this.closeModal}
             footer={null}
           >
-            <UserEditForm
+            <UserCRUD
               userPoolId={activeUserPool}
               user={selectedUser}
               onAttributesUpdate={this.onAttributesUpdate}
+              modelTitleUpdate={this.updateModalTitle}
             />
           </Modal>
         </div>
