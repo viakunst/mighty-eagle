@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import userManagerConfig from '../../config/userManagerConfig';
 
-class SignOutButton extends Component<{}, {}> {
-  static async signOutRedirect() {
+function SignOutButton() {
+  const signOutRedirect = async () => {
     // https://vktestdomain.auth.eu-west-2.amazoncognito.com/oauth2/token
     const endpoint = userManagerConfig.metadata.token_endpoint.slice(0, -12).concat('logout');
     console.log(endpoint);
@@ -16,22 +16,20 @@ class SignOutButton extends Component<{}, {}> {
     const serverUri = 'http://localhost:3000';
     console.log(serverUri);
     window.location.assign(requestUri);
-  }
+  };
 
   // WARNING: completely clears local storage (of this site).
   // This shouldn't pose a problem since you are already logging out.
-  static signOut() {
-    SignOutButton.signOutRedirect();
+  const signOut = () => {
+    signOutRedirect();
     localStorage.clear();
-  }
+  };
 
-  render() {
-    return (
-      <button type="button" onClick={() => SignOutButton.signOut()}>
-        Activate Lasers
-      </button>
-    );
-  }
+  return (
+    <button type="button" onClick={() => signOut()}>
+      Activate Lasers
+    </button>
+  );
 }
 
 export default SignOutButton;
