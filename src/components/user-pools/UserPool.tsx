@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Divider, Modal, Select, Table, Input, Button,
@@ -44,52 +44,41 @@ interface UserPoolState {
   modelTitle: String,
 }
 
-export class UserPool extends Component<{}, UserPoolState> {
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      users: [],
-      pools: [],
-      attributes: ['name', 'email'],
-      searchAttribute: '',
-      activeUserPool: null,
-      userSelected: false,
-      selectedUser: null,
-      modelTitle: 'Account bekijken.',
-    };
-  }
+export function UserPool() {
+  const [state, setState] = useState<UserPoolState>({
+    users: [],
+    pools: [],
+    attributes: ['name', 'email'],
+    searchAttribute: '',
+    activeUserPool: null,
+    userSelected: false,
+    selectedUser: null,
+    modelTitle: 'Account bekijken.',
+  });
 
-  async componentDidMount() {
+  // componentDidMount
+  useEffect(() => {
     Cognito.client().send(new ListUserPoolsCommand({
       MaxResults: 60,
     })).then((response) => {
       const pools = response.UserPools;
-      this.setState({ pools });
+      setState({ ...state, pools });
     }).catch((err) => console.log('ERROR', err));
-  }
+  }, []);
 
-  setEnabled = async (username: string, enabled: boolean) => {
-    const { activeUserPool } = this.state;
-    const params = {
-      Username: username,
-      UserPoolId: activeUserPool ?? undefined,
-    };
-    try {
-      await Cognito.client().send(enabled
-        ? new AdminEnableUserCommand(params)
-        : new AdminDisableUserCommand(params));
-      const users = await this.fetchUsers(activeUserPool);
-      this.setState({ users });
-    } catch (e) {
-      console.log('ERROR', e);
-    }
+  const flushAttributes = (attributes:Attribute[]) => {
+    const flushedAttributes:any = {};
+    attributes.forEach((attribute:Attribute) => {
+      flushedAttributes[attribute.Name] = attribute.Value;
+    });
+    return flushedAttributes;
   };
 
   /* eslint no-await-in-loop:0 */
   // AWS does not allow you to fetch the entire list at once.
   // So therefore I put a await in a loop to iterate through the entire user pool.
   // This is going to be slow as the list goes toward 1000 users.
-  fetchUsers = async (userPoolId: string | null, filter:string | undefined = undefined) => {
+  const fetchUsers = async (userPoolId: string | null, filter:string | undefined = undefined) => {
     let users:any = [];
     let response = await Cognito.client().send(new ListUsersCommand({
       UserPoolId: userPoolId ?? undefined,
@@ -108,7 +97,7 @@ export class UserPool extends Component<{}, UserPoolState> {
 
     return users.map((user:any, index:any) => ({
       key: index,
-      attributes: this.flushAttributes(user.Attributes),
+      attributes: flushAttributes(user.Attributes),
       username: user.Username,
       created: user.UserCreateDate,
       status: user.UserStatus,
@@ -117,28 +106,38 @@ export class UserPool extends Component<{}, UserPoolState> {
     }));
   };
 
-  flushAttributes = (attributes:Attribute[]) => {
-    const flushedAttributes:any = {};
-    attributes.forEach((attribute:Attribute) => {
-      flushedAttributes[attribute.Name] = attribute.Value;
-    });
-    return flushedAttributes;
+  const setEnabled = async (username: string, enabled: boolean) => {
+    const { activeUserPool } = state;
+    const params = {
+      Username: username,
+      UserPoolId: activeUserPool ?? undefined,
+    };
+    try {
+      await Cognito.client().send(enabled
+        ? new AdminEnableUserCommand(params)
+        : new AdminDisableUserCommand(params));
+      const users = await fetchUsers(activeUserPool);
+      setState({ ...state, users });
+    } catch (e) {
+      console.log('ERROR', e);
+    }
   };
 
-  handleChange = async (userPoolId: any) => {
-    const users = await this.fetchUsers(userPoolId);
+  const handleChange = async (userPoolId: any) => {
+    const users = await fetchUsers(userPoolId);
     console.log(users[0]);
-    this.setState({ users, activeUserPool: userPoolId });
+    setState({ ...state, users, activeUserPool: userPoolId });
   };
 
-  openModal = async (e: MouseEvent, username: string) => {
+  const openModal = async (e: MouseEvent, username: string) => {
     const {
       activeUserPool,
-    } = this.state;
+    } = state;
     e.preventDefault();
     if (username === 'create-user') {
       if (activeUserPool) {
-        this.setState({
+        setState({
+          ...state,
           selectedUser: null,
           userSelected: true,
         });
@@ -155,7 +154,8 @@ export class UserPool extends Component<{}, UserPoolState> {
         tempuser.Attributes = response.UserAttributes;
         console.log(tempuser);
 
-        this.setState({
+        setState({
+          ...state,
           selectedUser: tempuser,
           userSelected: true,
         });
@@ -165,190 +165,191 @@ export class UserPool extends Component<{}, UserPoolState> {
     }
   };
 
-  closeModal = () => {
-    this.setState({
+  const closeModal = () => {
+    setState({
+      ...state,
       userSelected: false,
       modelTitle: 'Gebruiker bekijken.',
     });
   };
 
-  updateModalTitle = (str:String) => {
-    this.setState({
+  const updateModalTitle = (str: String) => {
+    setState({
+      ...state,
       modelTitle: str,
     });
   };
 
-  onAttributesUpdate = async () => {
-    const { activeUserPool } = this.state;
-    const users = await this.fetchUsers(activeUserPool);
-    this.setState({
+  const onAttributesUpdate = async () => {
+    const { activeUserPool } = state;
+    const users = await fetchUsers(activeUserPool);
+    setState({
+      ...state,
       userSelected: false,
       users,
     });
   };
 
-  handleSearchAttribute = (searchAttribute:string) => {
-    this.setState({ searchAttribute });
+  const handleSearchAttribute = (searchAttribute:string) => {
+    setState({ ...state, searchAttribute });
   };
 
-  onSearch = async (value:string) => {
-    const { searchAttribute, activeUserPool } = this.state;
+  const onSearch = async (value:string) => {
+    const { searchAttribute, activeUserPool } = state;
     const filterString = `${searchAttribute}^="${value}"`;
     console.log(filterString);
-    const users = await this.fetchUsers(activeUserPool, filterString);
+    const users = await fetchUsers(activeUserPool, filterString);
 
-    this.setState({ users });
+    setState({ ...state, users });
   };
 
-  render() {
-    const columns: ColumnsType<UserPoolUser> = [
-      {
-        title: 'Naam',
-        dataIndex: ['attributes', 'name'],
-        key: 'name',
-        sorter: (a, b) => a.attributes.name.localeCompare(b.attributes.name),
-        sortDirections: ['ascend', 'descend'],
-      },
-      {
-        title: 'Email',
-        dataIndex: ['attributes', 'email'],
-        key: 'email',
-        sorter: (a, b) => a.attributes.email.localeCompare(b.attributes.email),
-        sortDirections: ['ascend', 'descend'],
-      },
-      {
-        title: 'Status',
-        dataIndex: 'status',
-        key: 'status',
-        filters: [
-          {
-            text: 'CONFIRMED',
-            value: 'CONFIRMED',
-          },
-          {
-            text: 'RESET_REQUIRED',
-            value: 'RESET_REQUIRED',
-          },
-        ],
-        onFilter: (value, record) => record.status.indexOf(value) === 0,
-        sorter: (a, b) => a.status.localeCompare(b.status),
-        sortDirections: ['ascend', 'descend'],
-      },
-      {
-        title: 'Created',
-        dataIndex: 'created',
-        key: 'created',
-        // sorter: (a, b) => a.created.localeCompare(b.created),
-        // sortDirections: ['ascend', 'descend'],
-      },
-      {
-        title: 'Modified',
-        dataIndex: 'modified',
-        key: 'modified',
-        // sorter: (a, b) => a.modified.localeCompare(b.modified),
-        // sortDirections: ['ascend', 'descend'],
-      },
-      {
-        title: 'Enabled',
-        dataIndex: 'enabled',
-        key: 'enabled',
-        sorter: (a, b) => a.enabled.localeCompare(b.enabled),
-        sortDirections: ['ascend', 'descend'],
-      },
-      {
-        title: 'Action',
-        key: 'action',
-        render: (text, record) => (
-          <>
-            <span>
-              <button type="button" onClick={(e) => this.openModal(e.nativeEvent, record.username)}> details</button>
-            </span>
-            <span>
-              <Icon
-                onClick={(e) => this.openModal(e.nativeEvent, record.username)}
-                style={{ fontSize: 21, color: '#888' }}
-                type="edit"
-              />
-              <Divider type="vertical" />
-              <Icon
-                onClick={() => {
-                  this.setEnabled(record.username, record.enabled !== 'enabled');
-                }}
-                style={{ fontSize: 21 }}
-                type={record.enabled === 'enabled' ? 'lock' : 'unlock'}
-              />
-            </span>
-          </>
-        ),
-      },
-    ];
-    const {
-      pools, attributes, users, selectedUser, userSelected, activeUserPool, modelTitle,
-    } = this.state;
-    return (
-      <div>
-
-        <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-
-          <div className="row">
-            <Select
-              placeholder="Select User Pool"
-              style={{ width: 200, marginBottom: 10 }}
-              onChange={this.handleChange}
-            >
-              {pools?.map((pool) => (
-                <Option
-                  key={pool.Id ?? ''}
-                  value={pool.Id ?? ''}
-                >{pool.Name}
-                </Option>
-              ))}
-            </Select>
-            <Select
-              placeholder="Select search"
-              style={{ width: 200, marginBottom: 10 }}
-              onChange={this.handleSearchAttribute}
-            >
-              {attributes?.map((attribute:string) => (
-                <Option
-                  key={attribute ?? ''}
-                  value={attribute ?? ''}
-                >{attribute}
-                </Option>
-              ))}
-            </Select>
-            <Search placeholder="input search text" allowClear onSearch={this.onSearch} style={{ width: 200 }} />
-            <Button type="primary" onClick={(e) => this.openModal(e.nativeEvent, 'create-user')}>
-              Maak account aan.
-            </Button>
-
-            <Link to="/">
-              <Button>
-                Annuleren
-              </Button>
-            </Link>
-          </div>
-
-          <Table pagination={false} columns={columns} dataSource={users} />
-
-          <Modal
-            title={modelTitle}
-            destroyOnClose
-            visible={userSelected}
-            onCancel={this.closeModal}
-            footer={null}
-          >
-            <UserCRUD
-              userPoolId={activeUserPool}
-              user={selectedUser}
-              onAttributesUpdate={this.onAttributesUpdate}
-              modelTitleUpdate={this.updateModalTitle}
+  const columns: ColumnsType<UserPoolUser> = [
+    {
+      title: 'Naam',
+      dataIndex: ['attributes', 'name'],
+      key: 'name',
+      sorter: (a, b) => a.attributes.name.localeCompare(b.attributes.name),
+      sortDirections: ['ascend', 'descend'],
+    },
+    {
+      title: 'Email',
+      dataIndex: ['attributes', 'email'],
+      key: 'email',
+      sorter: (a, b) => a.attributes.email.localeCompare(b.attributes.email),
+      sortDirections: ['ascend', 'descend'],
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      filters: [
+        {
+          text: 'CONFIRMED',
+          value: 'CONFIRMED',
+        },
+        {
+          text: 'RESET_REQUIRED',
+          value: 'RESET_REQUIRED',
+        },
+      ],
+      onFilter: (value, record) => record.status.indexOf(value) === 0,
+      sorter: (a, b) => a.status.localeCompare(b.status),
+      sortDirections: ['ascend', 'descend'],
+    },
+    {
+      title: 'Created',
+      dataIndex: 'created',
+      key: 'created',
+      // sorter: (a, b) => a.created.localeCompare(b.created),
+      // sortDirections: ['ascend', 'descend'],
+    },
+    {
+      title: 'Modified',
+      dataIndex: 'modified',
+      key: 'modified',
+      // sorter: (a, b) => a.modified.localeCompare(b.modified),
+      // sortDirections: ['ascend', 'descend'],
+    },
+    {
+      title: 'Enabled',
+      dataIndex: 'enabled',
+      key: 'enabled',
+      sorter: (a, b) => a.enabled.localeCompare(b.enabled),
+      sortDirections: ['ascend', 'descend'],
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (text, record) => (
+        <>
+          <span>
+            <button type="button" onClick={(e) => openModal(e.nativeEvent, record.username)}> details</button>
+          </span>
+          <span>
+            <Icon
+              onClick={(e) => openModal(e.nativeEvent, record.username)}
+              style={{ fontSize: 21, color: '#888' }}
+              type="edit"
             />
-          </Modal>
+            <Divider type="vertical" />
+            <Icon
+              onClick={() => {
+                setEnabled(record.username, record.enabled !== 'enabled');
+              }}
+              style={{ fontSize: 21 }}
+              type={record.enabled === 'enabled' ? 'lock' : 'unlock'}
+            />
+          </span>
+        </>
+      ),
+    },
+  ];
+  const {
+    pools, attributes, users, selectedUser, userSelected, activeUserPool, modelTitle,
+  } = state;
+  return (
+    <div>
+
+      <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+
+        <div className="row">
+          <Select
+            placeholder="Select User Pool"
+            style={{ width: 200, marginBottom: 10 }}
+            onChange={handleChange}
+          >
+            {pools?.map((pool) => (
+              <Option
+                key={pool.Id ?? ''}
+                value={pool.Id ?? ''}
+              >{pool.Name}
+              </Option>
+            ))}
+          </Select>
+          <Select
+            placeholder="Select search"
+            style={{ width: 200, marginBottom: 10 }}
+            onChange={handleSearchAttribute}
+          >
+            {attributes?.map((attribute:string) => (
+              <Option
+                key={attribute ?? ''}
+                value={attribute ?? ''}
+              >{attribute}
+              </Option>
+            ))}
+          </Select>
+          <Search placeholder="input search text" allowClear onSearch={onSearch} style={{ width: 200 }} />
+          <Button type="primary" onClick={(e) => openModal(e.nativeEvent, 'create-user')}>
+            Maak account aan.
+          </Button>
+
+          <Link to="/">
+            <Button>
+              Annuleren
+            </Button>
+          </Link>
         </div>
+
+        <Table pagination={false} columns={columns} dataSource={users} />
+
+        <Modal
+          title={modelTitle}
+          destroyOnClose
+          visible={userSelected}
+          onCancel={closeModal}
+          footer={null}
+        >
+          <UserCRUD
+            userPoolId={activeUserPool}
+            user={selectedUser}
+            onAttributesUpdate={onAttributesUpdate}
+            modelTitleUpdate={updateModalTitle}
+          />
+        </Modal>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default UserPool;
