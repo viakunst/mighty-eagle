@@ -3,11 +3,9 @@ import { UserData } from 'react-oidc';
 import {
   Button, Form,
 } from 'antd';
-import { AttributeType } from '@aws-sdk/client-cognito-identity-provider';
 
 import '../style/Profile.css';
 import { userAttributeConfig } from '../config/attributeConfig';
-import awsManager from '../services/awsManager';
 
 const formItemLayout = {
   labelCol: {
@@ -24,32 +22,18 @@ export default function ProfileEdit() {
   const [form] = Form.useForm();
 
   const userData = useContext(UserData);
-  const { user } = userData;
-
   // Render all attributes
-  const formItems = userAttributeConfig.map(
+  const rows: any[] = [];
+  const initial: any[] = [];
+  const formItems = userAttributeConfig.forEach(
     (attribute) => {
-      if (user != null) {
-        console.log(user.profile[attribute.getAttribute()]);
-        return (attribute.edit(user.profile[attribute.getAttribute()]));
-      }
-      return null;
+      rows.push(attribute.edit(null));
+      initial.push(attribute.view(userData));
     },
   );
-  console.log(formItems);
 
   const onFinish = async () => {
-    const userAttributes: AttributeType[] = [];
 
-    console.log(form.getFieldsValue());
-    userAttributeConfig.forEach((at) => {
-      userAttributes.push({
-        Name: at.getAttribute(),
-        Value: at.value(form.getFieldValue(`attributes[${at.getAttribute()}]`)),
-      });
-    });
-    console.log(userAttributes);
-    awsManager.update(userData, userAttributes);
   };
 
   return (
@@ -59,6 +43,7 @@ export default function ProfileEdit() {
         wrapperCol={formItemLayout?.wrapperCol}
         form={form}
         onFinish={onFinish}
+        initialValues={{ userAttr: initial }}
       >
         {formItems}
         <Form.Item wrapperCol={{

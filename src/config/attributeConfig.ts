@@ -17,14 +17,13 @@ const userAttributeConfig = [
   }),
   BooleanAttribute({
     Name: 'Akkoord Beeldbeleid',
-    Attribute: 'image_consent',
+    Attribute: 'custom:image_consent_2',
     Description: 'Voor meer informatie, ga naar <..>',
   }),
 ];
 
+// Basic create user. contains all field initially given.
 const createUserAttributeConfig = [
-  // Name is the attribute primary key.
-  // These need to be unique for each attribute therefore.
   TextAttribute({
     Name: 'E-mail',
     Attribute: 'email',
@@ -36,6 +35,14 @@ const createUserAttributeConfig = [
   TextAttribute({
     Name: 'Achternaam',
     Attribute: 'family_name',
+  }),
+  TextAttribute({
+    Name: 'Geboortedatum',
+    Attribute: 'birthdate',
+  }),
+  TextAttribute({
+    Name: 'Telefoonnummer',
+    Attribute: 'phone_number',
   }),
 ];
 

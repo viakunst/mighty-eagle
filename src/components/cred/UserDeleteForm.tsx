@@ -41,6 +41,7 @@ const UserDeleteForm = (props:UserAttributesProps) => {
 
   const onFinish = async () => {
     console.log(form.getFieldValue('sure'));
+    console.log(form.getFieldsValue());
     const check = form.getFieldValue('sure');
     if (check === 'test') {
       try {

@@ -15,19 +15,36 @@ export default function BooleanAttribute({ Name, Attribute, Description }: any) 
         </tr>
       );
     },
-    edit: (value:boolean | null) => {
-      if (value === true) {
+    edit: (value:string | null) => {
+      if (value === 'true') {
+        // const eslint:boolean = true;
         return (
-          <Form.Item name={Attribute} valuePropName="checked" wrapperCol={{ offset: 8, span: 16 }}>
-            <Checkbox>{Name}</Checkbox>
+          <Form.Item
+            label={Name}
+            name={`attributes[${Attribute}]`}
+            valuePropName="checked"
+            key={Attribute}
+          >
+            <Checkbox />
           </Form.Item>
         );
       }
       return (
-        <Form.Item name={Attribute} valuePropName="unchecked" wrapperCol={{ offset: 8, span: 16 }}>
-          <Checkbox>{Name}</Checkbox>
+        <Form.Item
+          label={Name}
+          name={`attributes[${Attribute}]`}
+          valuePropName="checked"
+          key={Attribute}
+        >
+          <Checkbox />
         </Form.Item>
       );
+    },
+    value: (value:any) => {
+      if (value === true) {
+        return 'true';
+      }
+      return 'false';
     },
     validate: (value: any) => {
       if (value != null) {

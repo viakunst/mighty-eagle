@@ -24,13 +24,14 @@ export default function TextAttribute({ Name, Attribute, Description }: any) {
             required={false}
             key={Attribute}
             name={`attributes[${Attribute}]`}
+            initialValue={value}
             validateTrigger={['onChange', 'onBlur']}
             rules={[{
               required: false,
               whitespace: true,
             }]}
           >
-            <Input style={{ width: '60%', marginRight: 8 }} value={value} />
+            <Input style={{ width: '60%', marginRight: 8 }} />
           </Form.Item>
         );
       }
@@ -50,6 +51,7 @@ export default function TextAttribute({ Name, Attribute, Description }: any) {
         </Form.Item>
       );
     },
+    value: (value: any) => value,
     validate: (value: any) => {
       if (value != null) {
         return { succes: true, msg: 'valid' };

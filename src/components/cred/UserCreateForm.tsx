@@ -31,39 +31,44 @@ const UserCreateForm = (props:UserAttributesProps) => {
     userPoolId, onAttributesUpdate,
   } = props;
 
-  const onFinish = () => {
+  const onFinish = async () => {
     const userAttributes: AttributeType[] = [];
     const formData = form.getFieldsValue();
     console.log(formData);
     console.log(form.getFieldValue(['attributes', 'email']));
     console.log(form.getFieldValue('attributes[email]'));
 
+    // Push attributes that are actually editable.
     createUserAttributeConfig.forEach((at) => {
       const attribute:AttributeType = {
-        Name: at.getName(),
+        Name: at.getAttribute(),
         Value: form.getFieldValue(`attributes[${at.attribute}]`),
       };
       console.log(attribute);
       userAttributes.push(attribute);
     });
 
+    // Push attributes with fixed values.
+
     console.log(userAttributes);
-    const username = `user-${form.getFieldValue('attributes[email]')}`;
-    Cognito.client().send(new AdminCreateUserCommand({
-      DesiredDeliveryMediums: ['email'],
-      MessageAction: 'RESEND',
-      TemporaryPassword: 'pass',
-      UserAttributes: userAttributes,
-      Username: username,
-      UserPoolId: userPoolId ?? undefined,
-    })).then(() => {
-      message.info('User is successfully created!');
+    const username = form.getFieldValue('attributes[email]');
+    console.log(username);
+
+    try {
+      await Cognito.client().send(new AdminCreateUserCommand({
+        DesiredDeliveryMediums: ['EMAIL'],
+        MessageAction: 'SUPPRESS',
+        TemporaryPassword: 'Password@111222',
+        UserAttributes: userAttributes,
+        Username: username,
+        UserPoolId: userPoolId ?? undefined,
+      }));
+      message.info('UserAttributes is successfully updated!');
       onAttributesUpdate();
-    })
-      .catch((e) => {
-        message.info("Can't create user!");
-        console.log(e);
-      });
+    } catch (e) {
+      message.info("Can't update user!");
+      console.log(e);
+    }
   };
 
   const formItems = createUserAttributeConfig.map(
