@@ -1,6 +1,6 @@
 import { TextAttribute, BooleanAttribute } from '../attributes';
 
-const attributeConfig = [
+const userAttributeConfig = [
   // Name is the attribute primary key.
   // These need to be unique for each attribute therefore.
   TextAttribute({
@@ -22,4 +22,21 @@ const attributeConfig = [
   }),
 ];
 
-export default attributeConfig;
+const createUserAttributeConfig = [
+  // Name is the attribute primary key.
+  // These need to be unique for each attribute therefore.
+  TextAttribute({
+    Name: 'E-mail',
+    Attribute: 'email',
+  }),
+  TextAttribute({
+    Name: 'Voornaam',
+    Attribute: 'given_name',
+  }),
+  TextAttribute({
+    Name: 'Achternaam',
+    Attribute: 'family_name',
+  }),
+];
+
+export { userAttributeConfig, createUserAttributeConfig };

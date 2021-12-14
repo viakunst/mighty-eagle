@@ -103,6 +103,7 @@ const UserEditForm = (props:UserAttributesProps) => {
       </Form.Item>
     );
   });
+  console.log(formItems);
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>

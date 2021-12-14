@@ -1,12 +1,12 @@
 import React from 'react';
 
 import {
-  Button, Form, Input, message,
+  Button, Form, message,
 } from 'antd';
 
 import { AdminCreateUserCommand, AttributeType } from '@aws-sdk/client-cognito-identity-provider';
+import { createUserAttributeConfig } from '../../config/attributeConfig';
 import Cognito from '../../services/cognito';
-import { cognitoAttributes } from '../../config/helpers';
 
 interface UserAttributesProps {
   userPoolId: string | null;
@@ -38,15 +38,13 @@ const UserCreateForm = (props:UserAttributesProps) => {
     console.log(form.getFieldValue(['attributes', 'email']));
     console.log(form.getFieldValue('attributes[email]'));
 
-    cognitoAttributes.forEach((attribute1) => {
-      if (attribute1.Name) {
-        const attribute:AttributeType = {
-          Name: attribute1.Name,
-          Value: form.getFieldValue(`attributes[${attribute1.Name}]`),
-        };
-        console.log(attribute);
-        userAttributes.push(attribute);
-      }
+    createUserAttributeConfig.forEach((at) => {
+      const attribute:AttributeType = {
+        Name: at.getName(),
+        Value: form.getFieldValue(`attributes[${at.attribute}]`),
+      };
+      console.log(attribute);
+      userAttributes.push(attribute);
     });
 
     console.log(userAttributes);
@@ -68,22 +66,9 @@ const UserCreateForm = (props:UserAttributesProps) => {
       });
   };
 
-  const formItems = cognitoAttributes.map((field:any) => (
-    <Form.Item
-      label={field.Name}
-      required={false}
-      key={field.Name}
-      name={`attributes[${field.Name}]`}
-      initialValue={field.Name}
-      validateTrigger={['onChange', 'onBlur']}
-      rules={[{
-        required: false,
-        whitespace: true,
-      }]}
-    >
-      <Input style={{ width: '60%', marginRight: 8 }} />
-    </Form.Item>
-  ));
+  const formItems = createUserAttributeConfig.map(
+    (attribute) => (attribute.edit(null)),
+  );
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>

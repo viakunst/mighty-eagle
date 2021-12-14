@@ -1,5 +1,7 @@
 import React from 'react';
-import { Field, ErrorMessage } from 'formik';
+import {
+  Form, Checkbox,
+} from 'antd';
 
 export default function BooleanAttribute({ Name, Attribute, Description }: any) {
   return {
@@ -13,19 +15,28 @@ export default function BooleanAttribute({ Name, Attribute, Description }: any) 
         </tr>
       );
     },
-    edit: () => (
-      <>
-        <Field type="checkbox" name={Name} />
-        <ErrorMessage name={Name} component="div" />
-      </>
-    ),
+    edit: (value:boolean | null) => {
+      if (value === true) {
+        return (
+          <Form.Item name={Attribute} valuePropName="checked" wrapperCol={{ offset: 8, span: 16 }}>
+            <Checkbox>{Name}</Checkbox>
+          </Form.Item>
+        );
+      }
+      return (
+        <Form.Item name={Attribute} valuePropName="unchecked" wrapperCol={{ offset: 8, span: 16 }}>
+          <Checkbox>{Name}</Checkbox>
+        </Form.Item>
+      );
+    },
     validate: (value: any) => {
       if (value != null) {
-        return true;
+        return { succes: true, msg: 'valid' };
       }
-      return false;
+      return { succes: false, msg: 'error' };
     },
     getName: () => Name,
+    getAttribute: () => Attribute,
     getDescription: () => Description,
   };
 }
