@@ -1,38 +1,80 @@
-import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
 import { UserData } from 'react-oidc';
 import {
-  Button, Modal,
+  Button, Modal, Table,
 } from 'antd';
+import { GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import '../style/Profile.css';
-import ProfileEdit from '../components/ProfileEdit';
+import ProfileEdit from '../components/cred/ProfileEdit';
 import { userAttributeConfig } from '../config/attributeConfig';
 import AdminMenu from '../components/admin-button/AdminMenu';
 import SignOutButton from '../components/admin-button/SignOutButton';
+import UserAttributeData from '../attributes/UserAttributeData';
+import Cognito from '../services/cognito';
 
 export default function Profile() {
   const userData = useContext(UserData);
   const [visible, setVisible] = useState(false);
-
-  // Render all attributes
-  const rows:any = [];
-
-  userAttributeConfig.forEach(
-    (attribute) => rows.push(attribute.view(userData)),
-  );
-  console.log(rows);
+  const intialUserAttributeData:UserAttributeData = new UserAttributeData();
+  const [userAttributes, setAttributes] = useState(intialUserAttributeData);
 
   const closeModal = () => {
     setVisible(false);
   };
 
+  const fetchUserData = async () => {
+    const response = await Cognito.client().send(new GetUserCommand({
+      AccessToken: userData.user?.access_token,
+    }));
+    return response.UserAttributes;
+  };
+
+  const onAttributesUpdate = async () => {
+    const userAttributes1 = await fetchUserData();
+    if (userAttributes1) {
+      const updatedUserAttributeData:UserAttributeData = new UserAttributeData();
+      updatedUserAttributeData.parseAWS(userAttributes1);
+      setAttributes(updatedUserAttributeData);
+    }
+    closeModal();
+  };
+
+  const parseUser = async () => {
+    const currentUserAttributes = await fetchUserData();
+    if (currentUserAttributes) {
+      const updatedUserAttributeData:UserAttributeData = new UserAttributeData();
+      updatedUserAttributeData.parseAWS(currentUserAttributes);
+      setAttributes(updatedUserAttributeData);
+    }
+  };
+
+  // This is a onmount effect.
+  useEffect(() => { parseUser(); }, []);
+
+  const columns = [
+    {
+      title: 'Veld',
+      dataIndex: 'key',
+      key: 'name',
+    },
+    {
+      title: 'Waarde',
+      dataIndex: 'value',
+      key: 'age',
+    },
+  ];
+
+  const columnData:any[] = [];
+
+  userAttributeConfig.forEach((att) => {
+    columnData.push(att.view(userAttributes));
+  });
+
   return (
     <div className="profile card row">
       <h2>Jouw profiel</h2>
-      <div className="table">
-        <table>
-          <tbody>{rows}</tbody>
-        </table>
+      <div>
+        <Table pagination={false} dataSource={columnData} columns={columns} />
       </div>
       <br />
       <Modal
@@ -42,17 +84,15 @@ export default function Profile() {
         onCancel={closeModal}
         footer={null}
       >
-        <ProfileEdit />
+        <ProfileEdit
+          userAttributes={userAttributes}
+          onAttributesUpdate={onAttributesUpdate}
+        />
       </Modal>
       <AdminMenu />
       <Button type="primary" onClick={() => setVisible(true)}>
         Gegevens bewerken
       </Button>
-      <Link to="/edit">
-        <Button>
-          d
-        </Button>
-      </Link> |{' '}
       <SignOutButton />
     </div>
   );

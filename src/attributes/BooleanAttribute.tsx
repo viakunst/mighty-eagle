@@ -2,38 +2,38 @@ import React from 'react';
 import {
   Form, Checkbox,
 } from 'antd';
+import UserAttributeData from './UserAttributeData';
 
 export default function BooleanAttribute({ Name, Attribute, Description }: any) {
   return {
     attribute: Attribute,
-    view: (userData: any) => {
-      const { user } = userData;
-      return (
-        <tr>
-          <th>{Name}</th>
-          <td>{user.profile[Attribute]}</td>
-        </tr>
-      );
+    view: (userData: UserAttributeData) => {
+      const { userAttributes } = userData;
+      let val = <> </>;
+      if (userAttributes[Attribute] === 'false') {
+        val = <Checkbox defaultChecked={false} disabled />;
+      } else {
+        val = <Checkbox defaultChecked disabled />;
+      }
+      return ({
+        title: Name,
+        key: Name,
+        value: val,
+      });
     },
     edit: (value:string | null) => {
+      let val = false;
       if (value === 'true') {
-        // const eslint:boolean = true;
-        return (
-          <Form.Item
-            label={Name}
-            name={`attributes[${Attribute}]`}
-            valuePropName="checked"
-            key={Attribute}
-          >
-            <Checkbox />
-          </Form.Item>
-        );
+        val = true;
+      } else {
+        val = false;
       }
       return (
         <Form.Item
           label={Name}
           name={`attributes[${Attribute}]`}
           valuePropName="checked"
+          initialValue={val}
           key={Attribute}
         >
           <Checkbox />

@@ -2,19 +2,19 @@ import React from 'react';
 import {
   Form, Input,
 } from 'antd';
+import UserAttributeData from './UserAttributeData';
 
 export default function TextAttribute({ Name, Attribute, Description }: any) {
   return {
     attribute: Attribute,
     errorMessage: '',
-    view: (userData: any) => {
-      const { user } = userData;
-      return (
-        <tr>
-          <th>{Name}</th>
-          <td>{user.profile[Attribute]}</td>
-        </tr>
-      );
+    view: (userData: UserAttributeData) => {
+      const { userAttributes } = userData;
+      return ({
+        title: Name,
+        key: Name,
+        value: userAttributes[Attribute],
+      });
     },
     edit: (value:string | null) => {
       if (value) {

@@ -5,14 +5,14 @@ import {
 } from 'antd';
 import { AttributeType } from '@aws-sdk/client-cognito-identity-provider';
 
-import '../style/Profile.css';
-import { userAttributeConfig } from '../config/attributeConfig';
-import awsManager from '../services/awsManager';
+import { userAttributeConfig } from '../../config/attributeConfig';
+import UserAttributeData from '../../attributes/UserAttributeData';
+import awsManager from '../../services/awsManager';
 
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    sm: { span: 4 },
+    sm: { span: 8 },
   },
   wrapperCol: {
     xs: { span: 24 },
@@ -20,36 +20,37 @@ const formItemLayout = {
   },
 };
 
-export default function ProfileEdit() {
+interface UserAttributesProps {
+  userAttributes: UserAttributeData;
+  onAttributesUpdate: () => Promise<void>;
+}
+
+export default function ProfileEdit(props:UserAttributesProps) {
   const [form] = Form.useForm();
-
   const userData = useContext(UserData);
-  const { user } = userData;
+  const { userAttributes, onAttributesUpdate } = props;
 
-  // Render all attributes
+  // flush to form.
   const formItems = userAttributeConfig.map(
     (attribute) => {
-      if (user != null) {
-        console.log(user.profile[attribute.getAttribute()]);
-        return (attribute.edit(user.profile[attribute.getAttribute()]));
+      if (userAttributes != null) {
+        return (attribute.edit(userAttributes.getAttribute(attribute.getAttribute())));
       }
       return null;
     },
   );
-  console.log(formItems);
 
   const onFinish = async () => {
-    const userAttributes: AttributeType[] = [];
-
-    console.log(form.getFieldsValue());
+    const updatedUserAttributes: AttributeType[] = [];
     userAttributeConfig.forEach((at) => {
-      userAttributes.push({
+      updatedUserAttributes.push({
         Name: at.getAttribute(),
         Value: at.value(form.getFieldValue(`attributes[${at.getAttribute()}]`)),
       });
     });
-    console.log(userAttributes);
-    awsManager.update(userData, userAttributes);
+
+    await awsManager.update(userData, updatedUserAttributes);
+    onAttributesUpdate();
   };
 
   return (

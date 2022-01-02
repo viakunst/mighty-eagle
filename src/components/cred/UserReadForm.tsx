@@ -19,12 +19,8 @@ const UserReadForm = (props:UserAttributesProps) => {
   console.log(user);
   let attributes:AttributeType[] = [];
   if (user && user.Attributes) {
-    console.log('doe t');
-    console.log(user.Attributes);
     attributes = user.Attributes;
   }
-
-  console.log(attributes);
 
   const columns = [
     {
