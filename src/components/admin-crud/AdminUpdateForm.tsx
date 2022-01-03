@@ -48,13 +48,10 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
       onAttributesUpdate();
     } catch (e) {
       message.info('Probleem met het bijwerken van dit account.');
-      console.log(e);
     }
   };
 
-  console.log(attributes);
   const formItems = adminUpdateUserAttributeConfig.getFormItems(attributes);
-
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
       <Form

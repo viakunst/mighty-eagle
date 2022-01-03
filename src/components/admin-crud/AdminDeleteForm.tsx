@@ -43,7 +43,6 @@ const AdminDeleteForm = (props:AdminDeleteProps) => {
         onAttributesUpdate();
       } catch (e) {
         message.info('Problem met verwijderen van dit account.');
-        console.log(e);
       }
     }
   };
