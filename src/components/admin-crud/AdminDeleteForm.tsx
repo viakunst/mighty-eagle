@@ -4,10 +4,10 @@ import {
   Button, Form, message, Checkbox,
 } from 'antd';
 
-import { AdminDeleteUserCommand, AttributeType, UserType } from '@aws-sdk/client-cognito-identity-provider';
+import { AdminDeleteUserCommand, UserType } from '@aws-sdk/client-cognito-identity-provider';
 import Cognito from '../../services/cognito';
 
-interface UserAttributesProps {
+interface AdminDeleteProps {
   userPoolId: string | null;
   user: UserType | null;
   onAttributesUpdate: () => Promise<void>;
@@ -15,50 +15,38 @@ interface UserAttributesProps {
 
 const formItemLayout = {
   labelCol: {
-    xs: { span: 24 },
-    sm: { span: 4 },
+    xs: { span: 3 },
+    sm: { span: 8 },
   },
   wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 20 },
+    xs: { span: 4 },
+    sm: { span: 4 },
   },
 };
 
-const UserDeleteForm = (props:UserAttributesProps) => {
+const AdminDeleteForm = (props:AdminDeleteProps) => {
   const [form] = Form.useForm();
 
   const {
     userPoolId, user, onAttributesUpdate,
   } = props;
 
-  console.log(user);
-  let attributes:AttributeType[] = [];
-  if (user && user.Attributes) {
-    console.log('doe t');
-    console.log(user.Attributes);
-    attributes = user.Attributes;
-  }
-
   const onFinish = async () => {
-    console.log(form.getFieldValue('sure'));
-    console.log(form.getFieldsValue());
     const check = form.getFieldValue('sure');
-    if (check === 'test') {
+    if (check === true) {
       try {
         await Cognito.client().send(new AdminDeleteUserCommand({
           UserPoolId: userPoolId ?? undefined,
           Username: user?.Username ?? '',
         }));
-        message.info('UserAttributes is successfully updated!');
+        message.info('Account succesvol verwijdert.');
         onAttributesUpdate();
       } catch (e) {
-        message.info("Can't update user!");
+        message.info('Problem met verwijderen van dit account.');
         console.log(e);
       }
     }
   };
-
-  console.log(attributes);
 
   const formItems = (
     <>
@@ -85,4 +73,4 @@ const UserDeleteForm = (props:UserAttributesProps) => {
   );
 };
 
-export default UserDeleteForm;
+export default AdminDeleteForm;

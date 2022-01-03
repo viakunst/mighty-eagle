@@ -18,7 +18,7 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 
 import { ColumnsType } from 'antd/lib/table';
-import UserCRUD from '../admin-button/UserCRUD';
+import UserCRUD from '../admin-components/AdminCRUD';
 import Cognito from '../../services/cognito';
 
 const { Option } = Select;

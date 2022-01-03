@@ -4,11 +4,11 @@ import {
   Button, Form, message,
 } from 'antd';
 
-import { AdminCreateUserCommand, AttributeType } from '@aws-sdk/client-cognito-identity-provider';
-import { createUserAttributeConfig } from '../../config/attributeConfig';
+import { AdminCreateUserCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { adminCreateUserAttributeConfig } from '../../config/attributeConfig';
 import Cognito from '../../services/cognito';
 
-interface UserAttributesProps {
+interface AdminCreateProps {
   userPoolId: string | null;
   onAttributesUpdate: () => Promise<void>;
 }
@@ -16,7 +16,7 @@ interface UserAttributesProps {
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    sm: { span: 4 },
+    sm: { span: 8 },
   },
   wrapperCol: {
     xs: { span: 24 },
@@ -24,7 +24,7 @@ const formItemLayout = {
   },
 };
 
-const UserCreateForm = (props:UserAttributesProps) => {
+const AdminCreateForm = (props:AdminCreateProps) => {
   const [form] = Form.useForm();
 
   const {
@@ -32,48 +32,27 @@ const UserCreateForm = (props:UserAttributesProps) => {
   } = props;
 
   const onFinish = async () => {
-    const userAttributes: AttributeType[] = [];
-    const formData = form.getFieldsValue();
-    console.log(formData);
-    console.log(form.getFieldValue(['attributes', 'email']));
-    console.log(form.getFieldValue('attributes[email]'));
-
-    // Push attributes that are actually editable.
-    createUserAttributeConfig.forEach((at) => {
-      const attribute:AttributeType = {
-        Name: at.getAttribute(),
-        Value: form.getFieldValue(`attributes[${at.attribute}]`),
-      };
-      console.log(attribute);
-      userAttributes.push(attribute);
-    });
-
-    // Push attributes with fixed values.
-
-    console.log(userAttributes);
+    // Push attributes, that are actually editable, to list.
+    const createUserAttributes = adminCreateUserAttributeConfig.getAWSAttributes(form);
+    // Email is the hardcoded username.
     const username = form.getFieldValue('attributes[email]');
-    console.log(username);
-
     try {
       await Cognito.client().send(new AdminCreateUserCommand({
         DesiredDeliveryMediums: ['EMAIL'],
         MessageAction: 'SUPPRESS',
         TemporaryPassword: 'Password@111222',
-        UserAttributes: userAttributes,
+        UserAttributes: createUserAttributes,
         Username: username,
         UserPoolId: userPoolId ?? undefined,
       }));
-      message.info('UserAttributes is successfully updated!');
+      message.info('Account succesvol aangemaakt.');
       onAttributesUpdate();
     } catch (e) {
-      message.info("Can't update user!");
-      console.log(e);
+      message.info(`Probleem met het aanmaken van dit account. \n ${e}`);
     }
   };
 
-  const formItems = createUserAttributeConfig.map(
-    (attribute) => (attribute.edit(null)),
-  );
+  const formItems = adminCreateUserAttributeConfig.getFormItems(null);
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
@@ -96,4 +75,4 @@ const UserCreateForm = (props:UserAttributesProps) => {
   );
 };
 
-export default UserCreateForm;
+export default AdminCreateForm;

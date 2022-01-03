@@ -3,10 +3,10 @@ import {
   Button,
 } from 'antd';
 import { UserType } from '@aws-sdk/client-cognito-identity-provider';
-import UserCreateForm from '../cred/UserCreateForm';
-import UserReadForm from '../cred/UserReadForm';
-import UserEditForm from '../cred/UserEditForm';
-import UserDeleteForm from '../cred/UserDeleteForm';
+import UserCreateForm from '../admin-crud/AdminCreateForm';
+import UserReadForm from '../admin-crud/AdminReadForm';
+import UserEditForm from '../admin-crud/AdminUpdateForm';
+import UserDeleteForm from '../admin-crud/AdminDeleteForm';
 
 interface UserCRUDProps {
   userPoolId: string | null;
@@ -23,12 +23,9 @@ const UserCRUD = (props:UserCRUDProps) => {
 
   // if user is null, this implies that it is a create component.
   if (user === null && mode !== 'create') {
-    console.log('user is null');
     setMode('create');
     props.modelTitleUpdate('Account aanmaken.');
   }
-
-  console.log(props);
 
   const updateMode = (str:string) => {
     setMode(str);

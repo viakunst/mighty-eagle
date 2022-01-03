@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Form, Checkbox,
 } from 'antd';
-import UserAttributeData from './UserAttributeData';
+import UserAttributeData from '../attributesClass/UserAttributeData';
 
 export default function BooleanAttribute({ Name, Attribute, Description }: any) {
   return {
@@ -13,7 +13,7 @@ export default function BooleanAttribute({ Name, Attribute, Description }: any) 
       if (userAttributes[Attribute] === 'false') {
         val = <Checkbox defaultChecked={false} disabled />;
       } else {
-        val = <Checkbox defaultChecked disabled />;
+        val = <> <Checkbox defaultChecked disabled /> </>;
       }
       return ({
         title: Name,

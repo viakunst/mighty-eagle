@@ -5,11 +5,11 @@ import {
 } from 'antd';
 import { GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import '../style/Profile.css';
-import ProfileEdit from '../components/cred/ProfileEdit';
+import ProfileEdit from '../components/user-components/UserProfileEdit';
 import { userAttributeConfig } from '../config/attributeConfig';
-import AdminMenu from '../components/admin-button/AdminMenu';
-import SignOutButton from '../components/admin-button/SignOutButton';
-import UserAttributeData from '../attributes/UserAttributeData';
+import AdminMenu from '../components/admin-components/AdminMenu';
+import SignOutButton from '../components/user-components/SignOutButton';
+import UserAttributeData from '../attributesClass/UserAttributeData';
 import Cognito from '../services/cognito';
 
 export default function Profile() {
@@ -32,9 +32,7 @@ export default function Profile() {
   const onAttributesUpdate = async () => {
     const userAttributes1 = await fetchUserData();
     if (userAttributes1) {
-      const updatedUserAttributeData:UserAttributeData = new UserAttributeData();
-      updatedUserAttributeData.parseAWS(userAttributes1);
-      setAttributes(updatedUserAttributeData);
+      setAttributes(new UserAttributeData(userAttributes1));
     }
     closeModal();
   };
@@ -42,9 +40,7 @@ export default function Profile() {
   const parseUser = async () => {
     const currentUserAttributes = await fetchUserData();
     if (currentUserAttributes) {
-      const updatedUserAttributeData:UserAttributeData = new UserAttributeData();
-      updatedUserAttributeData.parseAWS(currentUserAttributes);
-      setAttributes(updatedUserAttributeData);
+      setAttributes(new UserAttributeData(currentUserAttributes));
     }
   };
 
@@ -63,12 +59,7 @@ export default function Profile() {
       key: 'age',
     },
   ];
-
-  const columnData:any[] = [];
-
-  userAttributeConfig.forEach((att) => {
-    columnData.push(att.view(userAttributes));
-  });
+  const columnData:any[] = userAttributeConfig.getColumnItems(userAttributes);
 
   return (
     <div className="profile card row">

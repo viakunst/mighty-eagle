@@ -3,10 +3,9 @@ import { UserData } from 'react-oidc';
 import {
   Button, Form,
 } from 'antd';
-import { AttributeType } from '@aws-sdk/client-cognito-identity-provider';
 
 import { userAttributeConfig } from '../../config/attributeConfig';
-import UserAttributeData from '../../attributes/UserAttributeData';
+import UserAttributeData from '../../attributesClass/UserAttributeData';
 import awsManager from '../../services/awsManager';
 
 const formItemLayout = {
@@ -31,24 +30,10 @@ export default function ProfileEdit(props:UserAttributesProps) {
   const { userAttributes, onAttributesUpdate } = props;
 
   // flush to form.
-  const formItems = userAttributeConfig.map(
-    (attribute) => {
-      if (userAttributes != null) {
-        return (attribute.edit(userAttributes.getAttribute(attribute.getAttribute())));
-      }
-      return null;
-    },
-  );
+  const formItems = userAttributeConfig.getFormItems(userAttributes);
 
   const onFinish = async () => {
-    const updatedUserAttributes: AttributeType[] = [];
-    userAttributeConfig.forEach((at) => {
-      updatedUserAttributes.push({
-        Name: at.getAttribute(),
-        Value: at.value(form.getFieldValue(`attributes[${at.getAttribute()}]`)),
-      });
-    });
-
+    const updatedUserAttributes = userAttributeConfig.getAWSAttributes(form);
     await awsManager.update(userData, updatedUserAttributes);
     onAttributesUpdate();
   };

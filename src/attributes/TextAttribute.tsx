@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Form, Input,
 } from 'antd';
-import UserAttributeData from './UserAttributeData';
+import UserAttributeData from '../attributesClass/UserAttributeData';
 
 export default function TextAttribute({ Name, Attribute, Description }: any) {
   return {

@@ -4,23 +4,21 @@ import {
   Table,
 } from 'antd';
 
-import { AttributeType, UserType } from '@aws-sdk/client-cognito-identity-provider';
+import { UserType } from '@aws-sdk/client-cognito-identity-provider';
+import { adminReadUserAttributeConfig } from '../../config/attributeConfig';
+import UserAttributeData from '../../attributesClass/UserAttributeData';
 
-interface UserAttributesProps {
+interface AdminReadProps {
   user: UserType | null;
 }
 
 // Class handles view, edit, and delete.
-const UserReadForm = (props:UserAttributesProps) => {
+const AdminReadForm = (props:AdminReadProps) => {
   const {
     user,
   } = props;
 
-  console.log(user);
-  let attributes:AttributeType[] = [];
-  if (user && user.Attributes) {
-    attributes = user.Attributes;
-  }
+  const attributes = new UserAttributeData(user?.Attributes);
 
   const columns = [
     {
@@ -34,15 +32,7 @@ const UserReadForm = (props:UserAttributesProps) => {
       key: 'age',
     },
   ];
-
-  const columnData:any[] = [];
-  attributes.forEach((att) => {
-    columnData.push({
-      title: att.Name,
-      key: att.Name,
-      value: att.Value,
-    });
-  });
+  const columnData:any[] = adminReadUserAttributeConfig.getColumnItems(attributes);
 
   // Add delete, edit, cancel button.
   return (
@@ -52,4 +42,4 @@ const UserReadForm = (props:UserAttributesProps) => {
   );
 };
 
-export default UserReadForm;
+export default AdminReadForm;
