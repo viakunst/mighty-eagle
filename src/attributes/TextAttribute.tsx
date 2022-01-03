@@ -1,31 +1,65 @@
 import React from 'react';
-import { Field, ErrorMessage } from 'formik';
+import {
+  Form, Input,
+} from 'antd';
+import UserAttributeData from '../attributesClass/UserAttributeData';
 
 export default function TextAttribute({ Name, Attribute, Description }: any) {
   return {
     attribute: Attribute,
-    view: (userData: any) => {
-      const { user } = userData;
+    errorMessage: '',
+    view: (userData: UserAttributeData) => {
+      const { userAttributes } = userData;
+      return ({
+        title: Name,
+        key: Name,
+        value: userAttributes[Attribute],
+      });
+    },
+    edit: (value:string | null) => {
+      if (value) {
+        return (
+          <Form.Item
+            label={Name}
+            required={false}
+            key={Attribute}
+            name={`attributes[${Attribute}]`}
+            initialValue={value}
+            validateTrigger={['onChange', 'onBlur']}
+            rules={[{
+              required: false,
+              whitespace: true,
+            }]}
+          >
+            <Input style={{ width: '60%', marginRight: 8 }} />
+          </Form.Item>
+        );
+      }
       return (
-        <tr>
-          <th>{Name}</th>
-          <td>{user.profile[Attribute]}</td>
-        </tr>
+        <Form.Item
+          label={Name}
+          required={false}
+          key={Attribute}
+          name={`attributes[${Attribute}]`}
+          validateTrigger={['onChange', 'onBlur']}
+          rules={[{
+            required: false,
+            whitespace: true,
+          }]}
+        >
+          <Input style={{ width: '60%', marginRight: 8 }} />
+        </Form.Item>
       );
     },
-    edit: () => (
-      <>
-        <Field type="text" name={Name} />
-        <ErrorMessage name={Name} component="div" />
-      </>
-    ),
+    value: (value: any) => value,
     validate: (value: any) => {
       if (value != null) {
-        return true;
+        return { succes: true, msg: 'valid' };
       }
-      return false;
+      return { succes: false, msg: 'error' };
     },
     getName: () => Name,
+    getAttribute: () => Attribute,
     getDescription: () => Description,
   };
 }

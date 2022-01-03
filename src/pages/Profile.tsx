@@ -1,32 +1,89 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
 import { UserData } from 'react-oidc';
+import {
+  Button, Modal, Table,
+} from 'antd';
+import { GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import '../style/Profile.css';
-import attributeConfig from '../config/attributeConfig';
-import AdminMenu from '../components/admin-button/AdminMenu';
-import SignOutButton from '../components/admin-button/SignOutButton';
+import ProfileEdit from '../components/user-components/UserProfileEdit';
+import { userAttributeConfig } from '../config/attributeConfig';
+import AdminMenu from '../components/admin-components/AdminMenu';
+import SignOutButton from '../components/user-components/SignOutButton';
+import UserAttributeData from '../attributesClass/UserAttributeData';
+import Cognito from '../services/cognito';
 
 export default function Profile() {
   const userData = useContext(UserData);
+  const [visible, setVisible] = useState(false);
+  const intialUserAttributeData:UserAttributeData = new UserAttributeData();
+  const [userAttributes, setAttributes] = useState(intialUserAttributeData);
 
-  // Render all attributes
-  const rows:any = [];
+  const closeModal = () => {
+    setVisible(false);
+  };
 
-  attributeConfig.forEach(
-    (attribute) => rows.push(attribute.view(userData)),
-  );
+  const fetchUserData = async () => {
+    const response = await Cognito.client().send(new GetUserCommand({
+      AccessToken: userData.user?.access_token,
+    }));
+    return response.UserAttributes;
+  };
+
+  const onAttributesUpdate = async () => {
+    const userAttributes1 = await fetchUserData();
+    if (userAttributes1) {
+      setAttributes(new UserAttributeData(userAttributes1));
+    }
+    closeModal();
+  };
+
+  const parseUser = async () => {
+    const currentUserAttributes = await fetchUserData();
+    if (currentUserAttributes) {
+      setAttributes(new UserAttributeData(currentUserAttributes));
+    }
+  };
+
+  // This is a onmount effect.
+  useEffect(() => { parseUser(); }, []);
+
+  const columns = [
+    {
+      title: 'Veld',
+      dataIndex: 'key',
+      key: 'name',
+    },
+    {
+      title: 'Waarde',
+      dataIndex: 'value',
+      key: 'age',
+    },
+  ];
+  const columnData:any[] = userAttributeConfig.getColumnItems(userAttributes);
 
   return (
     <div className="profile card row">
       <h2>Jouw profiel</h2>
-      <div className="table">
-        <table>
-          <tbody>{rows}</tbody>
-        </table>
+      <div>
+        <Table pagination={false} dataSource={columnData} columns={columns} />
       </div>
       <br />
+      <Modal
+        title="Gegevens bewerken"
+        destroyOnClose
+        visible={visible}
+        onCancel={closeModal}
+        footer={null}
+      >
+        <ProfileEdit
+          userAttributes={userAttributes}
+          onAttributesUpdate={onAttributesUpdate}
+        />
+      </Modal>
       <AdminMenu />
-      <Link to="/edit">Gegevens bewerken</Link> |{' '}
+      <Button type="primary" onClick={() => setVisible(true)}>
+        Gegevens bewerken
+      </Button>
       <SignOutButton />
     </div>
   );

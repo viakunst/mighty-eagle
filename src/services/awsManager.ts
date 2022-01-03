@@ -4,20 +4,12 @@ import awsConfig from '../config/awsConfig';
 const awsManager = {
   client: new CognitoIdentityProviderClient(awsConfig),
 
-  update: async function getUserData(userData: any, dict: any) {
+  update: async function getUserData(userData: any, attributes: any) {
     // async?
     // Map dict to objects for command
-    const attributes: any = [];
-
-    dict.array.forEach((key: any) => {
-      attributes.push({
-        Name: key,
-        Value: dict[key],
-      });
-    });
 
     const params = {
-      AccessToken: userData.AccessToken,
+      AccessToken: userData.user?.access_token,
       UserAttributes: attributes,
     };
 

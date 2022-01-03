@@ -1,11 +1,16 @@
 import { TextAttribute, BooleanAttribute } from '../attributes';
+import AttributeConfig from '../attributesClass/AttributeConfig';
 
-const attributeConfig = [
-  // Name is the attribute primary key.
-  // These need to be unique for each attribute therefore.
+// Name is the attribute primary key.
+// These need to be unique for each attribute therefore.
+const basicAttributeConfig = new AttributeConfig([
   TextAttribute({
     Name: 'E-mail',
     Attribute: 'email',
+  }),
+  TextAttribute({
+    Name: 'Telefoonnummer',
+    Attribute: 'phone_number',
   }),
   TextAttribute({
     Name: 'Voornaam',
@@ -15,11 +20,34 @@ const attributeConfig = [
     Name: 'Achternaam',
     Attribute: 'family_name',
   }),
+  TextAttribute({
+    Name: 'Geboortedatum',
+    Attribute: 'birthdate',
+  }),
+]);
+
+const userAttributeConfig = basicAttributeConfig.extend([
   BooleanAttribute({
     Name: 'Akkoord Beeldbeleid',
-    Attribute: 'image_consent',
+    Attribute: 'custom:image_consent_2',
     Description: 'Voor meer informatie, ga naar <..>',
   }),
-];
+]);
 
-export default attributeConfig;
+const adminReadUserAttributeConfig = basicAttributeConfig.extend([
+  BooleanAttribute({
+    Name: 'Akkoord Beeldbeleid',
+    Attribute: 'custom:image_consent_2',
+    Description: 'Voor meer informatie, ga naar <..>',
+  }),
+]);
+
+const adminUpdateUserAttributeConfig = basicAttributeConfig.extend([]);
+
+// Basic create user. contains all field initially given.
+const adminCreateUserAttributeConfig = basicAttributeConfig.extend([]);
+
+export {
+  userAttributeConfig, adminCreateUserAttributeConfig,
+  adminUpdateUserAttributeConfig, adminReadUserAttributeConfig,
+};
