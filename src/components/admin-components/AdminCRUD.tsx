@@ -7,6 +7,7 @@ import UserCreateForm from '../admin-crud/AdminCreateForm';
 import UserReadForm from '../admin-crud/AdminReadForm';
 import UserEditForm from '../admin-crud/AdminUpdateForm';
 import UserDeleteForm from '../admin-crud/AdminDeleteForm';
+import Conditional from '../../helper/Conditional';
 
 interface UserCRUDProps {
   userPoolId: string | null;
@@ -15,52 +16,45 @@ interface UserCRUDProps {
   modelTitleUpdate: (str:String) => void;
 }
 
-const UserCRUD = (props:UserCRUDProps) => {
+const UserCRUD = ({
+  user, userPoolId, onAttributesUpdate, modelTitleUpdate,
+}: UserCRUDProps) => {
   const [mode, setMode] = useState('view');
-  const {
-    user,
-  } = props;
 
   // if user is null, this implies that it is a create component.
   if (user === null && mode !== 'create') {
     setMode('create');
-    props.modelTitleUpdate('Account aanmaken.');
+    modelTitleUpdate('Account aanmaken.');
   }
 
   const updateMode = (str:string) => {
     setMode(str);
     switch (str) {
       case 'create':
-        props.modelTitleUpdate('Account aanmaken.');
-        break;
-      case 'view':
-        props.modelTitleUpdate('Account bekijken.');
+        modelTitleUpdate('Account aanmaken.');
         break;
       case 'edit':
-        props.modelTitleUpdate('Account bewerken.');
+        modelTitleUpdate('Account bewerken.');
         break;
       case 'delete':
-        props.modelTitleUpdate('Account verwijderen.');
+        modelTitleUpdate('Account verwijderen.');
         break;
+      case 'view':
       default:
-        setMode('Fout.');
+        modelTitleUpdate('Account bekijken.');
         break;
     }
   };
 
-  if (mode === 'create') {
-    return (
-      <>
+  return (
+    <>
+      <Conditional isVisible={() => mode === 'create'}>
         <UserCreateForm
-          userPoolId={props.userPoolId}
-          onAttributesUpdate={props.onAttributesUpdate}
+          userPoolId={userPoolId ?? ''}
+          onAttributesUpdate={onAttributesUpdate}
         />
-      </>
-    );
-  }
-  if (mode === 'view') {
-    return (
-      <>
+      </Conditional>
+      <Conditional isVisible={() => mode === 'view'}>
         <Button type="primary" onClick={() => updateMode('edit')}>
           Bewerken
         </Button>
@@ -68,42 +62,30 @@ const UserCRUD = (props:UserCRUDProps) => {
           Verwijderen
         </Button>
         <UserReadForm
-          user={props.user}
+          user={user}
         />
-      </>
-    );
-  }
-  if (mode === 'edit') {
-    return (
-      <>
+      </Conditional>
+      <Conditional isVisible={() => mode === 'edit'}>
         <Button type="primary" onClick={() => updateMode('view')}>
           Annuleren
         </Button>
         <UserEditForm
-          userPoolId={props.userPoolId}
-          user={props.user}
-          onAttributesUpdate={props.onAttributesUpdate}
+          userPoolId={userPoolId}
+          user={user}
+          onAttributesUpdate={onAttributesUpdate}
         />
-      </>
-    );
-  }
-  if (mode === 'delete') {
-    return (
-      <>
+      </Conditional>
+      <Conditional isVisible={() => mode === 'delete'}>
         <Button type="primary" onClick={() => updateMode('view')}>
           Annuleren
         </Button>
         <UserDeleteForm
-          userPoolId={props.userPoolId}
-          user={props.user}
-          onAttributesUpdate={props.onAttributesUpdate}
+          userPoolId={userPoolId}
+          user={user}
+          onAttributesUpdate={onAttributesUpdate}
         />
-      </>
-    );
-  }
-  // Error in component, if this happens
-  return (
-    <>{mode} Error, mode of user view undefined.</>
+      </Conditional>
+    </>
   );
 };
 
