@@ -4,8 +4,8 @@ import {
   Button, Form, message, Checkbox,
 } from 'antd';
 
-import { AdminDeleteUserCommand, UserType } from '@aws-sdk/client-cognito-identity-provider';
-import Cognito from '../../services/cognito';
+import { UserType } from '@aws-sdk/client-cognito-identity-provider';
+import Cognito from '../../adapters/users/CognitoUserAdapter';
 
 interface AdminDeleteProps {
   userPoolId: string | null;
@@ -34,14 +34,10 @@ const AdminDeleteForm = (props:AdminDeleteProps) => {
   const onFinish = async () => {
     const check = form.getFieldValue('sure');
     if (check === true) {
-      try {
-        await Cognito.client().send(new AdminDeleteUserCommand({
-          UserPoolId: userPoolId ?? undefined,
-          Username: user?.Username ?? '',
-        }));
+      if (await Cognito.DeleteUser(user, userPoolId)) {
         message.info('Account succesvol verwijdert.');
         onAttributesUpdate();
-      } catch (e) {
+      } else {
         message.info('Problem met verwijderen van dit account.');
       }
     }

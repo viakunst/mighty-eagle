@@ -1,18 +1,13 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { makeAuthenticator, Callback } from 'react-oidc';
-import Cognito from '../services/cognito';
-import Profile from '../pages/Profile';
-import ProfileAdmin from '../pages/ProfileAdmin';
-import Error404 from '../pages/Error404';
-import userManager from '../services/userManager';
+import Cognito from '../../adapters/users/CognitoUserAdapter';
+import Profile from '../../pages/Profile';
+import ProfileAdmin from '../../pages/ProfileAdmin';
+import Error404 from '../../pages/Error404';
+import userManager from '../userManager';
 
-// Eslint requires this rename, because
-// Shorthand expected.
-const userManager1 = userManager;
-const WithAuth = makeAuthenticator({
-  userManager: userManager1,
-});
+const WithAuth = makeAuthenticator({ userManager });
 
 export default function App() {
   return (

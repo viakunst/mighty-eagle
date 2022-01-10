@@ -3,14 +3,13 @@ import { UserData } from 'react-oidc';
 import {
   Button, Modal, Table,
 } from 'antd';
-import { GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import '../style/Profile.css';
 import ProfileEdit from '../components/user-components/UserProfileEdit';
 import { userAttributeConfig } from '../config/attributeConfig';
 import AdminMenu from '../components/admin-components/AdminMenu';
 import SignOutButton from '../components/user-components/SignOutButton';
-import UserAttributeData from '../attributesClass/UserAttributeData';
-import Cognito from '../services/cognito';
+import UserAttributeData from '../config/attributesClass/UserAttributeData';
+import Cognito from '../adapters/profile/CognitoProfileAdapter';
 
 export default function Profile() {
   const userData = useContext(UserData);
@@ -23,10 +22,7 @@ export default function Profile() {
   };
 
   const fetchUserData = async () => {
-    const response = await Cognito.client().send(new GetUserCommand({
-      AccessToken: userData.user?.access_token,
-    }));
-    return response.UserAttributes;
+    return Cognito.UserAttributes(userData);
   };
 
   const onAttributesUpdate = async () => {

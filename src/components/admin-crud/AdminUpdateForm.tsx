@@ -4,10 +4,10 @@ import {
   Button, Form, message,
 } from 'antd';
 
-import { AdminUpdateUserAttributesCommand, UserType } from '@aws-sdk/client-cognito-identity-provider';
-import UserAttributeData from '../../attributesClass/UserAttributeData';
+import { UserType } from '@aws-sdk/client-cognito-identity-provider';
+import UserAttributeData from '../../config/attributesClass/UserAttributeData';
 import { adminCreateUserAttributeConfig, adminUpdateUserAttributeConfig } from '../../config/attributeConfig';
-import Cognito from '../../services/cognito';
+import Cognito from '../../adapters/users/CognitoUserAdapter';
 
 interface AdminUpdateProps {
   userPoolId: string | null;
@@ -38,15 +38,10 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
   const onFinish = async () => {
     const userAttributes = adminCreateUserAttributeConfig.getAWSAttributes(form);
     console.log(userAttributes);
-    try {
-      await Cognito.client().send(new AdminUpdateUserAttributesCommand({
-        UserPoolId: userPoolId ?? undefined,
-        Username: user?.Username ?? '',
-        UserAttributes: userAttributes,
-      }));
+    if (await Cognito.UpdateUser(userAttributes, user, userPoolId)) {
       message.info('Account succesvol bijgewerkt.');
       onAttributesUpdate();
-    } catch (e) {
+    } else {
       message.info('Probleem met het bijwerken van dit account.');
     }
   };

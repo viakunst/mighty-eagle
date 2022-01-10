@@ -7,18 +7,18 @@ import UserCreateForm from '../admin-crud/AdminCreateForm';
 import UserReadForm from '../admin-crud/AdminReadForm';
 import UserEditForm from '../admin-crud/AdminUpdateForm';
 import UserDeleteForm from '../admin-crud/AdminDeleteForm';
-import Conditional from '../../helper/Conditional';
+import Conditional from '../Conditional';
 
-interface UserCRUDProps {
+interface UserDetailsProps {
   userPoolId: string | null;
   user: UserType | null;
   onAttributesUpdate: () => Promise<void>;
-  modelTitleUpdate: (str:String) => void;
+  modelTitleUpdate: (str: string) => void;
 }
 
-const UserCRUD = ({
+export default function UserDetails({
   user, userPoolId, onAttributesUpdate, modelTitleUpdate,
-}: UserCRUDProps) => {
+}: UserDetailsProps) {
   const [mode, setMode] = useState('view');
 
   // if user is null, this implies that it is a create component.
@@ -87,6 +87,4 @@ const UserCRUD = ({
       </Conditional>
     </>
   );
-};
-
-export default UserCRUD;
+}

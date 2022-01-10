@@ -18,8 +18,8 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 
 import { ColumnsType } from 'antd/lib/table';
-import UserCRUD from '../admin-components/AdminCRUD';
-import Cognito from '../../services/cognito';
+import UserDetails from '../admin-components/UserDetails';
+import CognitoService from '../../helpers/CognitoService';
 
 const { Option } = Select;
 
@@ -58,7 +58,7 @@ export function UserPool() {
 
   // componentDidMount
   useEffect(() => {
-    Cognito.client().send(new ListUserPoolsCommand({
+    CognitoService.client().send(new ListUserPoolsCommand({
       MaxResults: 60,
     })).then((response) => {
       const pools = response.UserPools;
@@ -80,14 +80,14 @@ export function UserPool() {
   // This is going to be slow as the list goes toward 1000 users.
   const fetchUsers = async (userPoolId: string | null, filter:string | undefined = undefined) => {
     let users:any = [];
-    let response = await Cognito.client().send(new ListUsersCommand({
+    let response = await CognitoService.client().send(new ListUsersCommand({
       UserPoolId: userPoolId ?? undefined,
       Filter: filter,
     }));
 
     users = users.concat(response.Users);
     while (response.PaginationToken) {
-      response = await Cognito.client().send(new ListUsersCommand({
+      response = await CognitoService.client().send(new ListUsersCommand({
         UserPoolId: userPoolId ?? undefined,
         Filter: filter,
         PaginationToken: response.PaginationToken,
@@ -113,7 +113,7 @@ export function UserPool() {
       UserPoolId: activeUserPool ?? undefined,
     };
     try {
-      await Cognito.client().send(enabled
+      await CognitoService.client().send(enabled
         ? new AdminEnableUserCommand(params)
         : new AdminDisableUserCommand(params));
       const users = await fetchUsers(activeUserPool);
@@ -144,7 +144,7 @@ export function UserPool() {
       }
     } else {
       try {
-        const response = await Cognito.client().send(new AdminGetUserCommand({
+        const response = await CognitoService.client().send(new AdminGetUserCommand({
           UserPoolId: activeUserPool ?? undefined,
           Username: username,
         }));
@@ -340,7 +340,7 @@ export function UserPool() {
           onCancel={closeModal}
           footer={null}
         >
-          <UserCRUD
+          <UserDetails
             userPoolId={activeUserPool}
             user={selectedUser}
             onAttributesUpdate={onAttributesUpdate}

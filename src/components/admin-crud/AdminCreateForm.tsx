@@ -4,9 +4,8 @@ import {
   Button, Form, message,
 } from 'antd';
 
-import { AdminCreateUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { adminCreateUserAttributeConfig } from '../../config/attributeConfig';
-import Cognito from '../../services/cognito';
+import Cognito from '../../adapters/users/CognitoUserAdapter';
 
 interface AdminCreateProps {
   userPoolId: string | null;
@@ -36,19 +35,11 @@ const AdminCreateForm = (props:AdminCreateProps) => {
     const createUserAttributes = adminCreateUserAttributeConfig.getAWSAttributes(form);
     // Email is the hardcoded username.
     const username = form.getFieldValue('attributes[email]');
-    try {
-      await Cognito.client().send(new AdminCreateUserCommand({
-        DesiredDeliveryMediums: ['EMAIL'],
-        MessageAction: 'SUPPRESS',
-        TemporaryPassword: 'Password@111222',
-        UserAttributes: createUserAttributes,
-        Username: username,
-        UserPoolId: userPoolId ?? undefined,
-      }));
+    if (await Cognito.CreateUser(createUserAttributes, username, userPoolId ?? undefined)) {
       message.info('Account succesvol aangemaakt.');
       onAttributesUpdate();
-    } catch (e) {
-      message.info(`Probleem met het aanmaken van dit account. \n ${e}`);
+    } else {
+      message.info('Probleem met het aanmaken van dit account.');
     }
   };
 

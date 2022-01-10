@@ -5,7 +5,7 @@ import {
   Button,
 } from 'antd';
 
-import Cognito from '../../services/cognito';
+import Cognito from '../../adapters/users/CognitoUserAdapter';
 
 export default function AdminMenu() {
   const [state, setState] = useState({

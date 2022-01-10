@@ -5,8 +5,8 @@ import {
 } from 'antd';
 
 import { userAttributeConfig } from '../../config/attributeConfig';
-import UserAttributeData from '../../attributesClass/UserAttributeData';
-import awsManager from '../../services/awsManager';
+import UserAttributeData from '../../config/attributesClass/UserAttributeData';
+import awsManager from '../../adapters/profile/CognitoProfileAdapter';
 
 const formItemLayout = {
   labelCol: {
