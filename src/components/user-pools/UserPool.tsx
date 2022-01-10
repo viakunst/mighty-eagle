@@ -8,11 +8,7 @@ import Icon from '@ant-design/icons';
 import 'antd/dist/antd.css';
 
 import {
-  AdminEnableUserCommand,
-  AdminDisableUserCommand,
   ListUserPoolsCommand,
-  ListUsersCommand,
-  AdminGetUserCommand,
   UserPoolDescriptionType,
   UserType,
 } from '@aws-sdk/client-cognito-identity-provider';
@@ -20,6 +16,7 @@ import {
 import { ColumnsType } from 'antd/lib/table';
 import UserDetails from '../admin-components/UserDetails';
 import CognitoService from '../../helpers/CognitoService';
+import Cognito from '../../adapters/users/CognitoUserAdapter';
 
 const { Option } = Select;
 
@@ -79,22 +76,7 @@ export function UserPool() {
   // So therefore I put a await in a loop to iterate through the entire user pool.
   // This is going to be slow as the list goes toward 1000 users.
   const fetchUsers = async (userPoolId: string | null, filter:string | undefined = undefined) => {
-    let users:any = [];
-    let response = await CognitoService.client().send(new ListUsersCommand({
-      UserPoolId: userPoolId ?? undefined,
-      Filter: filter,
-    }));
-
-    users = users.concat(response.Users);
-    while (response.PaginationToken) {
-      response = await CognitoService.client().send(new ListUsersCommand({
-        UserPoolId: userPoolId ?? undefined,
-        Filter: filter,
-        PaginationToken: response.PaginationToken,
-      }));
-      users = users.concat(response.Users);
-    }
-
+    const users = await Cognito.ListUsers(userPoolId, filter);
     return users.map((user:any, index:any) => ({
       key: index,
       attributes: flushAttributes(user.Attributes),
@@ -108,18 +90,11 @@ export function UserPool() {
 
   const setEnabled = async (username: string, enabled: boolean) => {
     const { activeUserPool } = state;
-    const params = {
-      Username: username,
-      UserPoolId: activeUserPool ?? undefined,
-    };
-    try {
-      await CognitoService.client().send(enabled
-        ? new AdminEnableUserCommand(params)
-        : new AdminDisableUserCommand(params));
+    if (await Cognito.UserSetEnabled(enabled, username, activeUserPool)) {
       const users = await fetchUsers(activeUserPool);
       setState({ ...state, users });
-    } catch (e) {
-      console.log('ERROR', e);
+    } else {
+      console.log('ERROR');
     }
   };
 
@@ -143,13 +118,8 @@ export function UserPool() {
         });
       }
     } else {
-      try {
-        const response = await CognitoService.client().send(new AdminGetUserCommand({
-          UserPoolId: activeUserPool ?? undefined,
-          Username: username,
-        }));
-        console.log(response);
-
+      const response = await Cognito.GetUser(username, activeUserPool);
+      if (response !== false) {
         const tempuser:UserType = response;
         tempuser.Attributes = response.UserAttributes;
         console.log(tempuser);
@@ -159,8 +129,8 @@ export function UserPool() {
           selectedUser: tempuser,
           userSelected: true,
         });
-      } catch (err) {
-        console.log("Can't get user: ", err);
+      } else {
+        console.log("Can't get user");
       }
     }
   };

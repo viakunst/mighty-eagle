@@ -1,5 +1,5 @@
 import { AttributeType } from '@aws-sdk/client-cognito-identity-provider';
-import { userAttributeConfig } from '../attributeConfig';
+import { userAttributeConfig } from '../../config/attributeConfig';
 
 // Type class for parsing profile data.
 export default class UserAttributesData {

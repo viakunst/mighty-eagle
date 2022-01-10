@@ -5,7 +5,7 @@ import {
 } from 'antd';
 
 import { UserType } from '@aws-sdk/client-cognito-identity-provider';
-import UserAttributeData from '../../config/attributesClass/UserAttributeData';
+import UserAttributeData from '../../attributes/attributesClass/UserAttributeData';
 import { adminCreateUserAttributeConfig, adminUpdateUserAttributeConfig } from '../../config/attributeConfig';
 import Cognito from '../../adapters/users/CognitoUserAdapter';
 

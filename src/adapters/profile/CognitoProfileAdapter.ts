@@ -3,8 +3,8 @@ import { GetCallerIdentityCommand, STSClient } from '@aws-sdk/client-sts';
 import { REGION } from '../../config/awsConfig';
 import CognitoService from '../../helpers/CognitoService';
 
-const awsManager = {
-  update: async function getUserData(userData: any, attributes: any) {
+export default class CognitoProfileAdapter {
+  static async UpdateUser(userData: any, attributes: any) {
     // async?
     // Map dict to objects for command
 
@@ -16,16 +16,16 @@ const awsManager = {
     const command = new UpdateUserAttributesCommand(params);
 
     return CognitoService.client().send(command);
-  },
+  }
 
-  async UserAttributes(userData: any) {
+  static async GetUser(userData: any) {
     const response = await CognitoService.client().send(new GetUserCommand({
       AccessToken: userData.user?.access_token,
     }));
     return response.UserAttributes;
-  },
+  }
 
-  async getRole(): Promise<string> {
+  static async GetRole(): Promise<string> {
     const sts = new STSClient({
       region: REGION,
       credentials: CognitoService.getCredentials() ?? CognitoService.throwOnMissingAuth(),
@@ -43,8 +43,5 @@ const awsManager = {
     } else {
       return 'failure';
     }
-  },
-
-};
-
-export default awsManager;
+  }
+}

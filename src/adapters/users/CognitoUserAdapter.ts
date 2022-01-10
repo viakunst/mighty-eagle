@@ -1,36 +1,26 @@
 import {
   AdminCreateUserCommand,
   AdminDeleteUserCommand,
+  AdminDisableUserCommand,
+  AdminEnableUserCommand,
+  AdminGetUserCommand,
   AdminUpdateUserAttributesCommand,
+  ListUsersCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity';
-import { fromCognitoIdentityPool, CognitoIdentityCredentials } from '@aws-sdk/credential-provider-cognito-identity';
-import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
-import {
-  REGION,
-  IDENTITY_POOL_ID,
-  USER_POOL_ID,
-  ACCOUNT_ID,
-} from '../../config/awsConfig';
 import CognitoService from '../../helpers/CognitoService';
 
-function throwOnMissingAuth(): never {
-  throw new Error('Invalid authentication result');
-}
-
-function saveCredentials(credentials: CognitoIdentityCredentials) {
-  localStorage.setItem('credentials', JSON.stringify(credentials));
-}
-
-function removeCredentials() {
-  localStorage.removeItem('credentials');
-}
-
-function getCredentials(): CognitoIdentityCredentials | null {
-  return JSON.parse(localStorage.getItem('credentials') ?? 'null');
-}
-
 export default class CognitoUserAdapter {
+  static async GetUser(username: any, userPoolId: any) {
+    try {
+      return await CognitoService.client().send(new AdminGetUserCommand({
+        UserPoolId: userPoolId ?? undefined,
+        Username: username,
+      }));
+    } catch (err) {
+      return false;
+    }
+  }
+
   static async CreateUser(createUserAttributes: any, username: any, userPoolId: any) {
     try {
       await CognitoService.client().send(new AdminCreateUserCommand({
@@ -72,55 +62,43 @@ export default class CognitoUserAdapter {
     }
   }
 
-  static saveIdToken(IdToken: string) {
-    localStorage.setItem('id_token', JSON.stringify(IdToken));
+  /* eslint no-await-in-loop:0 */
+  // AWS does not allow you to fetch the entire list at once.
+  // So therefore I put a await in a loop to iterate through the entire user pool.
+  // This is going to be slow as the list goes toward 1000 users.
+  static async ListUsers(userPoolId: string | null, filter:string | undefined = undefined) {
+    let users:any = [];
+    let response = await CognitoService.client().send(new ListUsersCommand({
+      UserPoolId: userPoolId ?? undefined,
+      Filter: filter,
+    }));
+
+    users = users.concat(response.Users);
+    while (response.PaginationToken) {
+      response = await CognitoService.client().send(new ListUsersCommand({
+        UserPoolId: userPoolId ?? undefined,
+        Filter: filter,
+        PaginationToken: response.PaginationToken,
+      }));
+      users = users.concat(response.Users);
+    }
+
+    return users;
   }
 
-  static getIdToken(): string | undefined {
-    return JSON.parse(localStorage.getItem('id_token') ?? 'undefined');
-  }
+  static async UserSetEnabled(enabled: boolean, username: any, userPoolId: any) {
+    const params = {
+      Username: username,
+      UserPoolId: userPoolId ?? undefined,
+    };
 
-  // Handles the getId protocol and the getCredentialsForIdentiry protocol.
-  static async signIn(IdToken: string | undefined): Promise<string> {
     try {
-      const credentials = await fromCognitoIdentityPool({
-        accountId: ACCOUNT_ID,
-        client: new CognitoIdentityClient({ region: REGION }),
-        identityPoolId: IDENTITY_POOL_ID,
-        logins: {
-          [`cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`]: IdToken ?? throwOnMissingAuth(),
-        },
-      })();
-      saveCredentials(credentials);
-      return 'succes';
-    } catch (err) {
-      console.log(err);
-
-      return 'failure';
+      CognitoService.client().send(enabled
+        ? new AdminEnableUserCommand(params)
+        : new AdminDisableUserCommand(params));
+      return true;
+    } catch (e) {
+      return false;
     }
-  }
-
-  static async getRole(): Promise<string> {
-    const sts = new STSClient({
-      region: REGION,
-      credentials: getCredentials() ?? throwOnMissingAuth(),
-    });
-    const stsCommand = new GetCallerIdentityCommand({});
-    const response = await sts.send(stsCommand);
-    if (response.Arn) {
-      const roleArray = response.Arn.split('/');
-      switch (roleArray[1]) {
-        case 'CognitoPowerUser':
-          return 'admin';
-        default:
-          return 'user';
-      }
-    } else {
-      return 'failure';
-    }
-  }
-
-  static signOut() {
-    removeCredentials();
   }
 }

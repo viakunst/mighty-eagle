@@ -5,8 +5,8 @@ import {
 } from 'antd';
 
 import { userAttributeConfig } from '../../config/attributeConfig';
-import UserAttributeData from '../../config/attributesClass/UserAttributeData';
-import awsManager from '../../adapters/profile/CognitoProfileAdapter';
+import UserAttributeData from '../../attributes/attributesClass/UserAttributeData';
+import Profile from '../../adapters/profile/CognitoProfileAdapter';
 
 const formItemLayout = {
   labelCol: {
@@ -34,7 +34,7 @@ export default function ProfileEdit(props:UserAttributesProps) {
 
   const onFinish = async () => {
     const updatedUserAttributes = userAttributeConfig.getAWSAttributes(form);
-    await awsManager.update(userData, updatedUserAttributes);
+    await Profile.UpdateUser(userData, updatedUserAttributes);
     onAttributesUpdate();
   };
 

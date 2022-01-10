@@ -6,7 +6,7 @@ import {
 
 import { UserType } from '@aws-sdk/client-cognito-identity-provider';
 import { adminReadUserAttributeConfig } from '../../config/attributeConfig';
-import UserAttributeData from '../../config/attributesClass/UserAttributeData';
+import UserAttributeData from '../../attributes/attributesClass/UserAttributeData';
 
 interface AdminReadProps {
   user: UserType | null;

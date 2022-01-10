@@ -8,8 +8,8 @@ import ProfileEdit from '../components/user-components/UserProfileEdit';
 import { userAttributeConfig } from '../config/attributeConfig';
 import AdminMenu from '../components/admin-components/AdminMenu';
 import SignOutButton from '../components/user-components/SignOutButton';
-import UserAttributeData from '../config/attributesClass/UserAttributeData';
-import Cognito from '../adapters/profile/CognitoProfileAdapter';
+import UserAttributeData from '../attributes/attributesClass/UserAttributeData';
+import UserProfile from '../adapters/profile/CognitoProfileAdapter';
 
 export default function Profile() {
   const userData = useContext(UserData);
@@ -21,9 +21,7 @@ export default function Profile() {
     setVisible(false);
   };
 
-  const fetchUserData = async () => {
-    return Cognito.UserAttributes(userData);
-  };
+  const fetchUserData = async () => UserProfile.GetUser(userData);
 
   const onAttributesUpdate = async () => {
     const userAttributes1 = await fetchUserData();

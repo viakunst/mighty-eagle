@@ -5,7 +5,8 @@ import {
   Button,
 } from 'antd';
 
-import Cognito from '../../adapters/users/CognitoUserAdapter';
+import Cognito from '../../helpers/CognitoService';
+import Profile from '../../adapters/profile/CognitoProfileAdapter';
 
 export default function AdminMenu() {
   const [state, setState] = useState({
@@ -16,7 +17,7 @@ export default function AdminMenu() {
   useEffect(() => {
     // TO-DO: check if Cognito has his credentials.
 
-    Cognito.signIn(Cognito.getIdToken()).then(() => Cognito.getRole().then((value) => {
+    Cognito.signIn(Cognito.getIdToken()).then(() => Profile.GetRole().then((value) => {
       setState({ ...state, admin: value });
     }).catch((err) => console.log('ERROR', err)));
   }, []);
