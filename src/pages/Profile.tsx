@@ -53,7 +53,7 @@ export default function Profile() {
       key: 'age',
     },
   ];
-  const columnData:any[] = userAttributeConfig.getColumnItems(userAttributes);
+  const columnData:any[] = userAttributeConfig.getColumnItems(userAttributes.userAttributes);
 
   return (
     <div className="profile card row">

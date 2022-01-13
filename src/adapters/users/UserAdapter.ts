@@ -1,10 +1,23 @@
-import { AdminGetUserCommandOutput } from '@aws-sdk/client-cognito-identity-provider';
+export type UserAttributes = Record<string, string | null>;
+
+export type Username = string;
 
 export default interface UserAdapter {
-  GetUser(username: any, userPoolId: any): Promise<AdminGetUserCommandOutput>;
-  CreateUser(createUserAttributes: any, username: any, userPoolId: any): Promise<boolean>;
-  DeleteUser(user: any, userPoolId: any): Promise<boolean>;
-  UpdateUser(userAttributes: any, user: any, userPoolId: any): Promise<boolean>;
-  ListUsers(userPoolId: string | null, filter:string | undefined): Promise<any>;
-  UserSetEnabled(enabled: boolean, username: any, userPoolId: any): Promise<boolean>;
+  id: string;
+
+  listUsers(filter?: string): Promise<User[]>;
+  getUser(username: Username): Promise<User | null>;
+  createUser(username: Username, userAttributes: UserAttributes): Promise<void>;
+  deleteUser(username: Username): Promise<void>;
+  updateUser(username: Username, userAttributes: UserAttributes): Promise<void>;
+  userSetEnabled(username: Username, enabled: boolean): Promise<void>;
+}
+
+export interface User {
+  username: Username;
+  userAttributes: UserAttributes;
+  status?: string,
+  created?: Date,
+  modified?: Date,
+  enabled?: boolean
 }

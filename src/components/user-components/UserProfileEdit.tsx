@@ -30,7 +30,7 @@ export default function ProfileEdit(props:UserAttributesProps) {
   const { userAttributes, onAttributesUpdate } = props;
 
   // flush to form.
-  const formItems = userAttributeConfig.getFormItems(userAttributes);
+  const formItems = userAttributeConfig.getFormItems(userAttributes.userAttributes);
 
   const onFinish = async () => {
     const updatedUserAttributes = userAttributeConfig.getAWSAttributes(form);

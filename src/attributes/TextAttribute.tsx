@@ -2,20 +2,17 @@ import React from 'react';
 import {
   Form, Input,
 } from 'antd';
-import UserAttributeData from './attributesClass/UserAttributeData';
+import { UserAttributes } from '../adapters/users/UserAdapter';
 
 export default function TextAttribute({ Name, Attribute, Description }: any) {
   return {
     attribute: Attribute,
     errorMessage: '',
-    view: (userData: UserAttributeData) => {
-      const { userAttributes } = userData;
-      return ({
-        title: Name,
-        key: Name,
-        value: userAttributes[Attribute],
-      });
-    },
+    view: (userData: UserAttributes) => ({
+      title: Name,
+      key: Name,
+      value: userData[Attribute],
+    }),
     edit: (value:string | null) => {
       if (value) {
         return (

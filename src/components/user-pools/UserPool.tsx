@@ -7,44 +7,41 @@ import {
 import Icon from '@ant-design/icons';
 import 'antd/dist/antd.css';
 
-import {
-  ListUserPoolsCommand,
-  UserPoolDescriptionType,
-  UserType,
-} from '@aws-sdk/client-cognito-identity-provider';
-
+import { ListUserPoolsCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { ColumnsType } from 'antd/lib/table';
 import UserDetails from '../admin-components/UserDetails';
 import CognitoService from '../../helpers/CognitoService';
-import Cognito from '../../adapters/users/CognitoUserAdapter';
+import UserAdapter, { User, UserAttributes } from '../../adapters/users/UserAdapter';
+import CognitoUserAdapter from '../../adapters/users/CognitoUserAdapter';
 
 const { Option } = Select;
 
 const { Search } = Input;
 
 interface UserPoolUser {
-  username: any, attributes:any, status: any, created: any, modified: any, enabled: any
-}
-
-interface Attribute {
-  Name:string, Value:string
+  username: string,
+  userAttributes: UserAttributes,
+  status: string,
+  created: string,
+  modified: string,
+  enabled: string
 }
 
 interface UserPoolState {
   users: UserPoolUser[] | undefined,
-  pools: UserPoolDescriptionType[] | undefined,
+  pools: Record<string, UserAdapter>,
   attributes: any | undefined,
   searchAttribute: string | null,
-  activeUserPool: string | null,
+  activeUserPool: UserAdapter | null,
   userSelected: boolean,
-  selectedUser: UserType | null,
-  modelTitle: String,
+  selectedUser: User | null,
+  modelTitle: string,
 }
 
 export function UserPool() {
   const [state, setState] = useState<UserPoolState>({
     users: [],
-    pools: [],
+    pools: {},
     attributes: ['name', 'email'],
     searchAttribute: '',
     activeUserPool: null,
@@ -58,50 +55,47 @@ export function UserPool() {
     CognitoService.client().send(new ListUserPoolsCommand({
       MaxResults: 60,
     })).then((response) => {
-      const pools = response.UserPools;
+      const pools = response.UserPools?.reduce((acc: Record<string, UserAdapter>, descr) => {
+        const adapter = new CognitoUserAdapter();
+        adapter.id = descr.Name ?? descr.Id ?? '';
+        adapter.userPoolId = descr.Id ?? '';
+        return {
+          ...acc,
+          [adapter.id]: adapter,
+        };
+      }, {}) ?? {};
       setState({ ...state, pools });
-    }).catch((err) => console.log('ERROR', err));
+    });
   }, []);
 
-  const flushAttributes = (attributes:Attribute[]) => {
-    const flushedAttributes:any = {};
-    attributes.forEach((attribute:Attribute) => {
-      flushedAttributes[attribute.Name] = attribute.Value;
-    });
-    return flushedAttributes;
-  };
-
-  /* eslint no-await-in-loop:0 */
-  // AWS does not allow you to fetch the entire list at once.
-  // So therefore I put a await in a loop to iterate through the entire user pool.
-  // This is going to be slow as the list goes toward 1000 users.
-  const fetchUsers = async (userPoolId: string | null, filter:string | undefined = undefined) => {
-    const users = await Cognito.ListUsers(userPoolId, filter);
-    return users.map((user:any, index:any) => ({
+  const fetchUsers = async (userPool: UserAdapter | null, filter?: string) => {
+    const users = await userPool?.listUsers(filter) ?? [];
+    return users.map((user, index) => ({
+      ...user,
       key: index,
-      attributes: flushAttributes(user.Attributes),
-      username: user.Username,
-      created: user.UserCreateDate,
-      status: user.UserStatus,
-      modified: user.UserLastModifiedDate,
-      enabled: user.Enabled ? 'enabled' : 'disabled',
+      enabled: user.enabled ? 'enabled' : 'disabled',
+      status: user.status ?? 'UNKNOWN',
+      created: user.created?.toLocaleDateString() ?? '',
+      modified: user.created?.toLocaleDateString() ?? '',
     }));
   };
 
   const setEnabled = async (username: string, enabled: boolean) => {
     const { activeUserPool } = state;
-    if (await Cognito.UserSetEnabled(enabled, username, activeUserPool)) {
+    try {
+      await activeUserPool?.userSetEnabled(username, enabled);
       const users = await fetchUsers(activeUserPool);
       setState({ ...state, users });
-    } else {
+    } catch (e) {
       console.log('ERROR');
     }
   };
 
-  const handleChange = async (userPoolId: any) => {
-    const users = await fetchUsers(userPoolId);
-    console.log(users[0]);
-    setState({ ...state, users, activeUserPool: userPoolId });
+  const handleChange = async (userPoolId: string) => {
+    const { pools } = state;
+    const userPool = pools[userPoolId] ?? null;
+    const users = await fetchUsers(userPool);
+    setState({ ...state, users, activeUserPool: userPool });
   };
 
   const openModal = async (e: MouseEvent, username: string) => {
@@ -118,15 +112,13 @@ export function UserPool() {
         });
       }
     } else {
-      const response = await Cognito.GetUser(username, activeUserPool);
-      if (response !== false) {
-        const tempuser:UserType = response;
-        tempuser.Attributes = response.UserAttributes;
-        console.log(tempuser);
+      const user = await activeUserPool?.getUser(username);
+      if (user) {
+        console.log(user);
 
         setState({
           ...state,
-          selectedUser: tempuser,
+          selectedUser: user,
           userSelected: true,
         });
       } else {
@@ -143,7 +135,7 @@ export function UserPool() {
     });
   };
 
-  const updateModalTitle = (str: String) => {
+  const updateModalTitle = (str: string) => {
     setState({
       ...state,
       modelTitle: str,
@@ -176,16 +168,16 @@ export function UserPool() {
   const columns: ColumnsType<UserPoolUser> = [
     {
       title: 'Naam',
-      dataIndex: ['attributes', 'name'],
+      dataIndex: ['userAttributes', 'name'],
       key: 'name',
-      sorter: (a, b) => a.attributes.name.localeCompare(b.attributes.name),
+      sorter: (a, b) => a.userAttributes.name?.localeCompare(b.userAttributes.name ?? '') ?? 0,
       sortDirections: ['ascend', 'descend'],
     },
     {
       title: 'Email',
-      dataIndex: ['attributes', 'email'],
+      dataIndex: ['userAttributes', 'email'],
       key: 'email',
-      sorter: (a, b) => a.attributes.email.localeCompare(b.attributes.email),
+      sorter: (a, b) => a.userAttributes.email?.localeCompare(b.userAttributes.email ?? '') ?? 0,
       sortDirections: ['ascend', 'descend'],
     },
     {
@@ -202,7 +194,7 @@ export function UserPool() {
           value: 'RESET_REQUIRED',
         },
       ],
-      onFilter: (value, record) => record.status.indexOf(value) === 0,
+      onFilter: (value, record) => (typeof value === 'string' ? record.status.indexOf(value) === 0 : false),
       sorter: (a, b) => a.status.localeCompare(b.status),
       sortDirections: ['ascend', 'descend'],
     },
@@ -257,6 +249,26 @@ export function UserPool() {
   const {
     pools, attributes, users, selectedUser, userSelected, activeUserPool, modelTitle,
   } = state;
+  let modal = <></>;
+  if (selectedUser && activeUserPool) {
+    modal = (
+      <Modal
+        title={modelTitle}
+        destroyOnClose
+        visible={userSelected}
+        onCancel={closeModal}
+        footer={null}
+      >
+        <UserDetails
+          userPool={activeUserPool}
+          user={selectedUser}
+          onAttributesUpdate={onAttributesUpdate}
+          modelTitleUpdate={updateModalTitle}
+        />
+      </Modal>
+    );
+  }
+
   return (
     <div>
 
@@ -268,11 +280,8 @@ export function UserPool() {
             style={{ width: 200, marginBottom: 10 }}
             onChange={handleChange}
           >
-            {pools?.map((pool) => (
-              <Option
-                key={pool.Id ?? ''}
-                value={pool.Id ?? ''}
-              >{pool.Name}
+            {Object.values(pools).map((pool) => (
+              <Option key={pool.id} value={pool.id}>{pool.id}
               </Option>
             ))}
           </Select>
@@ -303,20 +312,7 @@ export function UserPool() {
 
         <Table pagination={false} columns={columns} dataSource={users} />
 
-        <Modal
-          title={modelTitle}
-          destroyOnClose
-          visible={userSelected}
-          onCancel={closeModal}
-          footer={null}
-        >
-          <UserDetails
-            userPoolId={activeUserPool}
-            user={selectedUser}
-            onAttributesUpdate={onAttributesUpdate}
-            modelTitleUpdate={updateModalTitle}
-          />
-        </Modal>
+        { modal }
       </div>
     </div>
   );

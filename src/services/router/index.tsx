@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { makeAuthenticator, Callback } from 'react-oidc';
-import Cognito from '../../adapters/users/CognitoUserAdapter';
+import Cognito from '../../helpers/CognitoService';
 import Profile from '../../pages/Profile';
 import ProfileAdmin from '../../pages/ProfileAdmin';
 import Error404 from '../../pages/Error404';

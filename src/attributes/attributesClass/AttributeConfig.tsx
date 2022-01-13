@@ -1,11 +1,7 @@
-import { AttributeType } from '@aws-sdk/client-cognito-identity-provider';
 import {
   FormInstance,
 } from 'antd';
-
-interface UserAttributeData {
-  getAttribute(arg1:string): (arg1:string) => any;
-}
+import { UserAttributes } from '../../adapters/users/UserAdapter';
 
 // Type class for parsing form data.
 export default class AttributeConfig {
@@ -17,34 +13,28 @@ export default class AttributeConfig {
 
   extend = (config:any[]) => new AttributeConfig([...this.configAttributes, ...config]);
 
-  getColumnItems = (data:UserAttributeData) => {
+  getColumnItems = (data:UserAttributes) => {
     const columnData:any[] = [];
-    this.configAttributes.forEach((att) => {
-      columnData.push(att.view(data));
+    this.configAttributes.forEach((attr) => {
+      columnData.push(attr.view(data));
     });
     return columnData;
   };
 
-  getFormItems = (data:UserAttributeData | null) => {
-    const formItems = this.configAttributes.map(
-      (attribute) => {
-        if (data) {
-          return (attribute.edit(data.getAttribute(attribute.getAttribute())));
-        }
-        return (attribute.edit(null));
-      },
-    );
-    return formItems;
-  };
+  getFormItems = (data:UserAttributes | null) => this.configAttributes.map(
+    (attribute) => {
+      if (data) {
+        return (attribute.edit(data[attribute.getAttribute()]));
+      }
+      return (attribute.edit(null));
+    },
+  );
 
   getAWSAttributes = (form:FormInstance) => {
-    const updatedUserAttributes: AttributeType[] = [];
-    this.configAttributes.forEach((at) => {
-      updatedUserAttributes.push({
-        Name: at.getAttribute(),
-        Value: at.value(form.getFieldValue(`attributes[${at.getAttribute()}]`)),
-      });
-    });
+    const updatedUserAttributes: UserAttributes = this.configAttributes.reduce((acc, attr) => ({
+      ...acc,
+      [attr.getAttribute()]: attr.value(form.getFieldValue(`attributes[${attr.getAttribute()}]`)),
+    }), {});
     return updatedUserAttributes;
   };
 }

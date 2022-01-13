@@ -5,10 +5,10 @@ import {
 } from 'antd';
 
 import { adminCreateUserAttributeConfig } from '../../config/attributeConfig';
-import Cognito from '../../adapters/users/CognitoUserAdapter';
+import UserAdapter from '../../adapters/users/UserAdapter';
 
 interface AdminCreateProps {
-  userPoolId: string | null;
+  userPool: UserAdapter;
   onAttributesUpdate: () => Promise<void>;
 }
 
@@ -27,7 +27,7 @@ const AdminCreateForm = (props:AdminCreateProps) => {
   const [form] = Form.useForm();
 
   const {
-    userPoolId, onAttributesUpdate,
+    userPool, onAttributesUpdate,
   } = props;
 
   const onFinish = async () => {
@@ -35,10 +35,11 @@ const AdminCreateForm = (props:AdminCreateProps) => {
     const createUserAttributes = adminCreateUserAttributeConfig.getAWSAttributes(form);
     // Email is the hardcoded username.
     const username = form.getFieldValue('attributes[email]');
-    if (await Cognito.CreateUser(createUserAttributes, username, userPoolId ?? undefined)) {
+    try {
+      await userPool.createUser(username, createUserAttributes);
       message.info('Account succesvol aangemaakt.');
       onAttributesUpdate();
-    } else {
+    } catch {
       message.info('Probleem met het aanmaken van dit account.');
     }
   };
