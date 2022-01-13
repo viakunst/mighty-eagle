@@ -3,15 +3,21 @@ import {
   Form, Input,
 } from 'antd';
 import { UserAttributes } from '../adapters/users/UserAdapter';
+import AttributeInstance from './AttributeInstance';
+import AttributeConfigData from './AttributeConfigData';
 
-export default function TextAttribute({ Name, Attribute, Description }: any) {
+export default function TextAttribute({
+  Name,
+  Attribute,
+  Description,
+}: AttributeConfigData): AttributeInstance<string> {
   return {
     attribute: Attribute,
     errorMessage: '',
     view: (userData: UserAttributes) => ({
       title: Name,
       key: Name,
-      value: userData[Attribute],
+      value: (<>{userData[Attribute]}</>),
     }),
     edit: (value:string | null) => {
       if (value) {
