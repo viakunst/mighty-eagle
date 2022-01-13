@@ -98,32 +98,36 @@ export function UserPool() {
     setState({ ...state, users, activeUserPool: userPool });
   };
 
+  const createUser = async (e: MouseEvent) => {
+    const {
+      activeUserPool,
+    } = state;
+    e.preventDefault();
+    if (activeUserPool) {
+      setState({
+        ...state,
+        selectedUser: null,
+        userSelected: true,
+      });
+    }
+  };
+
   const openModal = async (e: MouseEvent, username: string) => {
     const {
       activeUserPool,
     } = state;
     e.preventDefault();
-    if (username === 'create-user') {
-      if (activeUserPool) {
-        setState({
-          ...state,
-          selectedUser: null,
-          userSelected: true,
-        });
-      }
-    } else {
-      const user = await activeUserPool?.getUser(username);
-      if (user) {
-        console.log(user);
+    const user = await activeUserPool?.getUser(username);
+    if (user) {
+      console.log(user);
 
-        setState({
-          ...state,
-          selectedUser: user,
-          userSelected: true,
-        });
-      } else {
-        console.log("Can't get user");
-      }
+      setState({
+        ...state,
+        selectedUser: user,
+        userSelected: true,
+      });
+    } else {
+      console.log("Can't get user");
     }
   };
 
@@ -249,26 +253,6 @@ export function UserPool() {
   const {
     pools, attributes, users, selectedUser, userSelected, activeUserPool, modelTitle,
   } = state;
-  let modal = <></>;
-  if (selectedUser && activeUserPool) {
-    modal = (
-      <Modal
-        title={modelTitle}
-        destroyOnClose
-        visible={userSelected}
-        onCancel={closeModal}
-        footer={null}
-      >
-        <UserDetails
-          userPool={activeUserPool}
-          user={selectedUser}
-          onAttributesUpdate={onAttributesUpdate}
-          modelTitleUpdate={updateModalTitle}
-        />
-      </Modal>
-    );
-  }
-
   return (
     <div>
 
@@ -299,7 +283,7 @@ export function UserPool() {
             ))}
           </Select>
           <Search placeholder="input search text" allowClear onSearch={onSearch} style={{ width: 200 }} />
-          <Button type="primary" onClick={(e) => openModal(e.nativeEvent, 'create-user')}>
+          <Button type="primary" onClick={(e) => createUser(e.nativeEvent)}>
             Maak account aan.
           </Button>
 
@@ -311,8 +295,22 @@ export function UserPool() {
         </div>
 
         <Table pagination={false} columns={columns} dataSource={users} />
-
-        { modal }
+        <Modal
+          title={modelTitle}
+          destroyOnClose
+          visible={userSelected}
+          onCancel={closeModal}
+          footer={null}
+        >
+          { activeUserPool && (
+            <UserDetails
+              userPool={activeUserPool}
+              user={selectedUser}
+              onAttributesUpdate={onAttributesUpdate}
+              modelTitleUpdate={updateModalTitle}
+            />
+          ) }
+        </Modal>
       </div>
     </div>
   );
