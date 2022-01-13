@@ -1,5 +1,6 @@
 import {
-  CognitoIdentityProviderClient,
+  AttributeType,
+  CognitoIdentityProviderClient, CognitoIdentityProviderClientConfig,
 } from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity';
 import { fromCognitoIdentityPool, CognitoIdentityCredentials } from '@aws-sdk/credential-provider-cognito-identity';
@@ -9,60 +10,52 @@ import {
   USER_POOL_ID,
   ACCOUNT_ID,
 } from '../config/awsConfig';
+import { UserAttributes } from '../adapters/users/UserAdapter';
+import OidcService from './OidcService';
 
-function saveCredentials(credentials: CognitoIdentityCredentials) {
-  localStorage.setItem('credentials', JSON.stringify(credentials));
-}
-
-function removeCredentials() {
-  localStorage.removeItem('credentials');
-}
+const CREDENTIALS = 'credentials';
 
 export default class CognitoService {
   static client(): CognitoIdentityProviderClient {
-    return new CognitoIdentityProviderClient({
+    return new CognitoIdentityProviderClient(this.config());
+  }
+
+  static config(): CognitoIdentityProviderClientConfig {
+    const credentials: CognitoIdentityCredentials | null = JSON.parse(localStorage.getItem(CREDENTIALS) ?? 'null');
+    return {
       region: REGION,
-      credentials: this.getCredentials() ?? this.throwOnMissingAuth(),
-    });
+      credentials: credentials ?? OidcService.throwOnMissingAuth(),
+    };
   }
 
-  static getCredentials(): CognitoIdentityCredentials | null {
-    return JSON.parse(localStorage.getItem('credentials') ?? 'null');
+  static awsAttributesToRecord(awsAttributes: AttributeType[]): UserAttributes {
+    // map response.UserAttributes to a record, skip records that don't have a value for Name
+    return awsAttributes.reduce((acc, attr) => (attr.Name ? ({
+      ...acc,
+      [attr.Name]: attr.Value,
+    }) : acc), {});
   }
 
-  static throwOnMissingAuth(): never {
-    throw new Error('Invalid authentication result');
-  }
-
-  static saveIdToken(IdToken: string) {
-    localStorage.setItem('id_token', JSON.stringify(IdToken));
-  }
-
-  static getIdToken(): string | undefined {
-    return JSON.parse(localStorage.getItem('id_token') ?? 'undefined');
+  static recordToAwsAttributes(record: UserAttributes): AttributeType[] {
+    // map record entries as key/value pairs to an AttributeType object, mapping null to undefined
+    return Object.entries(record).map(([key, value]) => ({ Name: key, Value: value ?? undefined }));
   }
 
   // Handles the getId protocol and the getCredentialsForIdentiry protocol.
-  static async signIn(IdToken: string | undefined): Promise<string> {
-    try {
-      const credentials = await fromCognitoIdentityPool({
-        accountId: ACCOUNT_ID,
-        client: new CognitoIdentityClient({ region: REGION }),
-        identityPoolId: IDENTITY_POOL_ID,
-        logins: {
-          [`cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`]: IdToken ?? this.throwOnMissingAuth(),
-        },
-      })();
-      saveCredentials(credentials);
-      return 'succes';
-    } catch (err) {
-      console.log(err);
+  static async signIn(idToken?: string): Promise<void> {
+    const credentials = await fromCognitoIdentityPool({
+      accountId: ACCOUNT_ID,
+      client: new CognitoIdentityClient({ region: REGION }),
+      identityPoolId: IDENTITY_POOL_ID,
+      logins: {
+        [`cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`]: idToken ?? OidcService.throwOnMissingAuth(),
+      },
+    })();
 
-      return 'failure';
-    }
+    localStorage.setItem(CREDENTIALS, JSON.stringify(credentials));
   }
 
   static signOut() {
-    removeCredentials();
+    localStorage.removeItem(CREDENTIALS);
   }
 }

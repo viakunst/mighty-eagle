@@ -5,8 +5,9 @@ import {
 } from 'antd';
 
 import { userAttributeConfig } from '../../config/attributeConfig';
-import UserAttributeData from '../../attributes/attributesClass/UserAttributeData';
-import Profile from '../../adapters/profile/CognitoProfileAdapter';
+import OidcService from '../../helpers/OidcService';
+import ProfileAdapter from '../../adapters/profile/ProfileAdapter';
+import { UserAttributes } from '../../adapters/users/UserAdapter';
 
 const formItemLayout = {
   labelCol: {
@@ -20,7 +21,8 @@ const formItemLayout = {
 };
 
 interface UserAttributesProps {
-  userAttributes: UserAttributeData;
+  profile: ProfileAdapter;
+  userAttributes: UserAttributes;
   onAttributesUpdate: () => Promise<void>;
 }
 
@@ -30,11 +32,12 @@ export default function ProfileEdit(props:UserAttributesProps) {
   const { userAttributes, onAttributesUpdate } = props;
 
   // flush to form.
-  const formItems = userAttributeConfig.getFormItems(userAttributes.userAttributes);
+  const formItems = userAttributeConfig.getFormItems(userAttributes);
 
   const onFinish = async () => {
     const updatedUserAttributes = userAttributeConfig.getAWSAttributes(form);
-    await Profile.UpdateUser(userData, updatedUserAttributes);
+    const accessToken = userData.user?.access_token ?? OidcService.throwOnMissingAuth();
+    await props.profile.updateUser(accessToken, updatedUserAttributes);
     onAttributesUpdate();
   };
 

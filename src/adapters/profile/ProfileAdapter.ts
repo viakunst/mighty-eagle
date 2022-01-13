@@ -1,7 +1,7 @@
-import { AttributeType } from '@aws-sdk/client-cognito-identity-provider';
+import { User, UserAttributes } from '../users/UserAdapter';
 
 export default interface ProfileAdapter {
-  UpdateUser(userData: any, attributes: any): Promise<boolean>;
-  GetUser(userData: any): Promise<AttributeType[] | undefined>;
-  GetRole(): Promise<string>;
+  updateUser(accessToken: string, attributes: UserAttributes): Promise<void>;
+  getUser(accessToken: string): Promise<User | null>;
+  getRole(): Promise<string>;
 }

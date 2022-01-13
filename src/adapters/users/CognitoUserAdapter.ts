@@ -13,19 +13,6 @@ import {
 import CognitoService from '../../helpers/CognitoService';
 import UserAdapter, { Username, User, UserAttributes } from './UserAdapter';
 
-function awsAttributesToRecord(awsAttributes: AttributeType[]): UserAttributes {
-  // map response.UserAttributes to a record, skip records that don't have a value for Name
-  return awsAttributes.reduce((acc, attr) => (attr.Name ? ({
-    ...acc,
-    [attr.Name]: attr.Value,
-  }) : acc), {});
-}
-
-function recordToAwsAttributes(record: UserAttributes): AttributeType[] {
-  // map record entries as key/value pairs to an AttributeType object, mapping null to undefined
-  return Object.entries(record).map(([key, value]) => ({ Name: key, Value: value ?? undefined }));
-}
-
 export default class CognitoUserAdapter implements UserAdapter {
   id!: string;
 
@@ -41,7 +28,7 @@ export default class CognitoUserAdapter implements UserAdapter {
       return null;
     }
 
-    const userAttributes = awsAttributesToRecord(response.UserAttributes);
+    const userAttributes = CognitoService.awsAttributesToRecord(response.UserAttributes);
 
     // return user object
     return {
@@ -55,7 +42,7 @@ export default class CognitoUserAdapter implements UserAdapter {
   }
 
   async createUser(username: string, userAttributes: UserAttributes) {
-    const awsAttributes: AttributeType[] = recordToAwsAttributes(userAttributes);
+    const awsAttributes: AttributeType[] = CognitoService.recordToAwsAttributes(userAttributes);
     await CognitoService.client().send(new AdminCreateUserCommand({
       DesiredDeliveryMediums: ['EMAIL'],
       MessageAction: 'SUPPRESS',
@@ -74,7 +61,7 @@ export default class CognitoUserAdapter implements UserAdapter {
   }
 
   async updateUser(username: string, userAttributes: UserAttributes) {
-    const awsAttributes = recordToAwsAttributes(userAttributes);
+    const awsAttributes = CognitoService.recordToAwsAttributes(userAttributes);
     await CognitoService.client().send(new AdminUpdateUserAttributesCommand({
       UserPoolId: this.userPoolId,
       Username: username,
@@ -104,7 +91,7 @@ export default class CognitoUserAdapter implements UserAdapter {
         if (!awsUser.Username) return acc;
         const user: User = ({
           username: awsUser.Username,
-          userAttributes: awsAttributesToRecord(awsUser.Attributes ?? []),
+          userAttributes: CognitoService.awsAttributesToRecord(awsUser.Attributes ?? []),
           status: awsUser.UserStatus,
           created: awsUser.UserCreateDate,
           modified: awsUser.UserLastModifiedDate,
