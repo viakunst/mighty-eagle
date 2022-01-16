@@ -26,34 +26,30 @@ export default function BooleanAttribute({
         value: val,
       });
     },
-    edit: (value:string | null) => {
-      const val = value === 'true';
-      return (
-        <Form.Item
-          label={Name}
-          name={`attributes[${Attribute}]`}
-          valuePropName="checked"
-          initialValue={val}
-          key={Attribute}
-        >
-          <Checkbox />
-        </Form.Item>
-      );
+    edit: (value:string | null) => (
+      <Form.Item
+        label={Name}
+        name={`attributes[${Attribute}]`}
+        valuePropName="checked"
+        initialValue={value === 'true'}
+        key={Attribute}
+        tooltip={Description ?? undefined}
+      >
+        <Checkbox />
+      </Form.Item>
+    ),
+    parse: (serialized: string) => {
+      switch (serialized) {
+        case 'true': return true;
+        case 'false': return false;
+        default: throw new Error();
+      }
     },
-    value: (value:any) => {
+    serialize: (value: boolean) => {
       if (value === true) {
         return 'true';
       }
       return 'false';
     },
-    validate: (value: any) => {
-      if (value != null) {
-        return { succes: true, msg: 'valid' };
-      }
-      return { succes: false, msg: 'error' };
-    },
-    getName: () => Name,
-    getAttribute: () => Attribute,
-    getDescription: () => Description,
   };
 }

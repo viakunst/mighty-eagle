@@ -28,7 +28,7 @@ export default class AttributeConfig {
   getFormItems = (data:UserAttributes | null) => this.configAttributes.map(
     (attribute) => {
       if (data) {
-        return (attribute.edit(data[attribute.getAttribute()]));
+        return (attribute.edit(data[attribute.attribute]));
       }
       return (attribute.edit(null));
     },
@@ -37,7 +37,7 @@ export default class AttributeConfig {
   getAWSAttributes = (form:FormInstance) => {
     const updatedUserAttributes: UserAttributes = this.configAttributes.reduce((acc, attr) => ({
       ...acc,
-      [attr.getAttribute()]: attr.value(form.getFieldValue(`attributes[${attr.getAttribute()}]`)),
+      [attr.attribute]: attr.serialize(form.getFieldValue(`attributes[${attr.attribute}]`)),
     }), {});
     return updatedUserAttributes;
   };
