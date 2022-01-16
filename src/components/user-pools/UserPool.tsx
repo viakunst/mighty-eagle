@@ -7,10 +7,8 @@ import {
 import Icon from '@ant-design/icons';
 import 'antd/dist/antd.css';
 
-import { ListUserPoolsCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { ColumnsType } from 'antd/lib/table';
 import UserDetails from '../admin-components/UserDetails';
-import CognitoService from '../../helpers/CognitoService';
 import UserAdapter, { User, UserAttributes } from '../../adapters/users/UserAdapter';
 import CognitoUserAdapter from '../../adapters/users/CognitoUserAdapter';
 
@@ -52,20 +50,7 @@ export function UserPool() {
 
   // componentDidMount
   useEffect(() => {
-    CognitoService.client().send(new ListUserPoolsCommand({
-      MaxResults: 60,
-    })).then((response) => {
-      const pools = response.UserPools?.reduce((acc: Record<string, UserAdapter>, descr) => {
-        const adapter = new CognitoUserAdapter();
-        adapter.id = descr.Name ?? descr.Id ?? '';
-        adapter.userPoolId = descr.Id ?? '';
-        return {
-          ...acc,
-          [adapter.id]: adapter,
-        };
-      }, {}) ?? {};
-      setState({ ...state, pools });
-    });
+    CognitoUserAdapter.fetchAll().then((pools) => setState({ ...state, pools }));
   }, []);
 
   const fetchUsers = async (userPool: UserAdapter | null, filter?: string) => {

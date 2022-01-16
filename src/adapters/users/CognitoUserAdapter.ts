@@ -6,6 +6,7 @@ import {
   AdminGetUserCommand,
   AdminUpdateUserAttributesCommand,
   AttributeType,
+  ListUserPoolsCommand,
   ListUsersCommand,
   ListUsersCommandOutput,
   UserType,
@@ -117,5 +118,20 @@ export default class CognitoUserAdapter implements UserAdapter {
     CognitoService.client().send(enabled
       ? new AdminEnableUserCommand(params)
       : new AdminDisableUserCommand(params));
+  }
+
+  static async fetchAll(): Promise<Record<string, CognitoUserAdapter>> {
+    const response = await CognitoService.client().send(new ListUserPoolsCommand({
+      MaxResults: 60,
+    }));
+    return response.UserPools?.reduce((acc: Record<string, CognitoUserAdapter>, descr) => {
+      const adapter = new CognitoUserAdapter();
+      adapter.id = descr.Name ?? descr.Id ?? '';
+      adapter.userPoolId = descr.Id ?? '';
+      return {
+        ...acc,
+        [adapter.id]: adapter,
+      };
+    }, {}) ?? {};
   }
 }
