@@ -2,8 +2,6 @@ import { BooleanAttribute, TextAttribute } from './types';
 import AttributeConfigData from './AttributeConfigData';
 import AttributeInstance from './AttributeInstance';
 
-type AttributeConfig = AttributeConfigData & { Type: string };
-
 function valid(object: any, key: string | number, type: string, required: boolean = true) {
   if (key in object) {
     if (typeof object[key] !== type) return false;
@@ -21,7 +19,7 @@ export default class AttributeConfigParser {
     return this.compile(attrs);
   }
 
-  static validate(jsonConfig: string): AttributeConfig[] {
+  static validate(jsonConfig: string): AttributeConfigData[] {
     const data = JSON.parse(jsonConfig);
     if (!(data instanceof Array)) {
       return [];
@@ -36,7 +34,7 @@ export default class AttributeConfigParser {
     });
   }
 
-  static compile(data: AttributeConfig[]): AttributeInstance<any>[] {
+  static compile(data: AttributeConfigData[]): AttributeInstance<any>[] {
     return data.map((attribute) => {
       switch (attribute.Type) {
         case 'string':
