@@ -3,44 +3,43 @@ import { UserData } from 'react-oidc';
 import {
   Button, Modal, Table,
 } from 'antd';
-import { GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import '../style/Profile.css';
+import CognitoProfileAdapter from '../adapters/profile/CognitoProfileAdapter';
 import ProfileEdit from '../components/user-components/UserProfileEdit';
 import { userAttributeConfig } from '../config/attributeConfig';
 import AdminMenu from '../components/admin-components/AdminMenu';
 import SignOutButton from '../components/user-components/SignOutButton';
-import UserAttributeData from '../attributesClass/UserAttributeData';
-import Cognito from '../services/cognito';
+import OidcService from '../helpers/OidcService';
+import { UserAttributes } from '../adapters/users/UserAdapter';
 
 export default function Profile() {
   const userData = useContext(UserData);
   const [visible, setVisible] = useState(false);
-  const intialUserAttributeData:UserAttributeData = new UserAttributeData();
+  const intialUserAttributeData: UserAttributes = {};
   const [userAttributes, setAttributes] = useState(intialUserAttributeData);
+  const profile = new CognitoProfileAdapter();
 
   const closeModal = () => {
     setVisible(false);
   };
 
   const fetchUserData = async () => {
-    const response = await Cognito.client().send(new GetUserCommand({
-      AccessToken: userData.user?.access_token,
-    }));
-    return response.UserAttributes;
+    const accessToken = userData.user?.access_token ?? OidcService.throwOnMissingAuth();
+    return profile.getUser(accessToken);
   };
 
   const onAttributesUpdate = async () => {
-    const userAttributes1 = await fetchUserData();
-    if (userAttributes1) {
-      setAttributes(new UserAttributeData(userAttributes1));
+    const user = await fetchUserData();
+    if (user) {
+      setAttributes(user.userAttributes);
     }
     closeModal();
   };
 
   const parseUser = async () => {
-    const currentUserAttributes = await fetchUserData();
-    if (currentUserAttributes) {
-      setAttributes(new UserAttributeData(currentUserAttributes));
+    const currentUser = await fetchUserData();
+    if (currentUser) {
+      setAttributes(currentUser.userAttributes);
     }
   };
 
@@ -76,11 +75,12 @@ export default function Profile() {
         footer={null}
       >
         <ProfileEdit
+          profile={profile}
           userAttributes={userAttributes}
           onAttributesUpdate={onAttributesUpdate}
         />
       </Modal>
-      <AdminMenu />
+      <AdminMenu profile={profile} />
       <Button type="primary" onClick={() => setVisible(true)}>
         Gegevens bewerken
       </Button>
