@@ -3,8 +3,8 @@ import {
   Form, Checkbox,
 } from 'antd';
 import { UserAttributes } from '../../adapters/users/UserAdapter';
-import AttributeInstance from '../attributesClass/AttributeInstance';
-import AttributeConfigData from '../attributesClass/AttributeConfigData';
+import AttributeInstance from '../AttributeInstance';
+import AttributeConfigData from '../AttributeConfigData';
 
 export default function BooleanAttribute({
   Name,
