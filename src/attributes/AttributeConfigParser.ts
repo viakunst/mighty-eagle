@@ -1,4 +1,4 @@
-import { BooleanAttribute, TextAttribute } from '../attributeTypes';
+import { BooleanAttribute, TextAttribute } from './types';
 import AttributeConfigData from './AttributeConfigData';
 import AttributeInstance from './AttributeInstance';
 

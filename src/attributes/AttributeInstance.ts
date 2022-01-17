@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import { UserAttributes } from '../../adapters/users/UserAdapter';
+import { UserAttributes } from '../adapters/users/UserAdapter';
 
 export default interface AttributeInstance<T> {
   attribute: string;
