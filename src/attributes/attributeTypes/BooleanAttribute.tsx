@@ -2,9 +2,9 @@ import React from 'react';
 import {
   Form, Checkbox,
 } from 'antd';
-import { UserAttributes } from '../adapters/users/UserAdapter';
-import AttributeInstance from './AttributeInstance';
-import AttributeConfigData from './AttributeConfigData';
+import { UserAttributes } from '../../adapters/users/UserAdapter';
+import AttributeInstance from '../attributesClass/AttributeInstance';
+import AttributeConfigData from '../attributesClass/AttributeConfigData';
 
 export default function BooleanAttribute({
   Name,
