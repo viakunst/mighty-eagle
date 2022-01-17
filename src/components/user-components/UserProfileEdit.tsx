@@ -1,13 +1,16 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { UserData } from 'react-oidc';
 import {
   Button, Form,
 } from 'antd';
 
-import { userAttributeConfig } from '../../config/attributeConfig';
+import attributeConfig from '../../config/attributeConfig';
 import OidcService from '../../helpers/OidcService';
 import ProfileAdapter from '../../adapters/profile/ProfileAdapter';
 import { UserAttributes } from '../../adapters/users/UserAdapter';
+import AttributeConfig from '../../attributes/AttributeConfig';
+import AttributeConfigParser from '../../attributes/AttributeConfigParser';
+import { ConfigContext } from '../../attributes/AttributeConfigData';
 
 const formItemLayout = {
   labelCol: {
@@ -30,12 +33,20 @@ export default function ProfileEdit(props:UserAttributesProps) {
   const [form] = Form.useForm();
   const userData = useContext(UserData);
   const { userAttributes, onAttributesUpdate } = props;
+  const [configInst, setConfigInst] = useState(new AttributeConfig([]));
+
+  // componentDidMount
+  useEffect(() => {
+    AttributeConfigParser.resolve(attributeConfig, ConfigContext.USER_MUTATE).then((config) => {
+      setConfigInst(new AttributeConfig(config));
+    });
+  }, []);
 
   // flush to form.
-  const formItems = userAttributeConfig.getFormItems(userAttributes);
+  const formItems = configInst.getFormItems(userAttributes);
 
   const onFinish = async () => {
-    const updatedUserAttributes = userAttributeConfig.getAWSAttributes(form);
+    const updatedUserAttributes = configInst.getAWSAttributes(form);
     const accessToken = userData.user?.access_token ?? OidcService.throwOnMissingAuth();
     await props.profile.updateUser(accessToken, updatedUserAttributes);
     onAttributesUpdate();

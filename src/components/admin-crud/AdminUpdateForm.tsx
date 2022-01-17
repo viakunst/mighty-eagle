@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Button, Form, message,
 } from 'antd';
 
-import { adminCreateUserAttributeConfig, adminUpdateUserAttributeConfig } from '../../config/attributeConfig';
+import attributeConfig from '../../config/attributeConfig';
 import UserAdapter, { User } from '../../adapters/users/UserAdapter';
+import AttributeConfig from '../../attributes/AttributeConfig';
+import AttributeConfigParser from '../../attributes/AttributeConfigParser';
+import { ConfigContext } from '../../attributes/AttributeConfigData';
 
 interface AdminUpdateProps {
   userPool: UserAdapter;
@@ -30,9 +33,17 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
   const {
     userPool, user, onAttributesUpdate,
   } = props;
+  const [configInst, setConfigInst] = useState(new AttributeConfig([]));
+
+  // componentDidMount
+  useEffect(() => {
+    AttributeConfigParser.resolve(attributeConfig, ConfigContext.ADMIN_MUTATE).then((config) => {
+      setConfigInst(new AttributeConfig(config));
+    });
+  }, []);
 
   const onFinish = async () => {
-    const userAttributes = adminCreateUserAttributeConfig.getAWSAttributes(form);
+    const userAttributes = configInst.getAWSAttributes(form);
     console.log(userAttributes);
     try {
       await userPool.updateUser(user.username, userAttributes);
@@ -43,7 +54,7 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
     }
   };
 
-  const formItems = adminUpdateUserAttributeConfig.getFormItems(user.userAttributes);
+  const formItems = configInst.getFormItems(user.userAttributes);
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
       <Form

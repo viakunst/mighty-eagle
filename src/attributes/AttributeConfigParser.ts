@@ -1,6 +1,7 @@
 import { BooleanAttribute, TextAttribute } from './types';
-import AttributeConfigData from './AttributeConfigData';
+import AttributeConfigData, { ConfigContext } from './AttributeConfigData';
 import AttributeInstance from './AttributeInstance';
+import ConfigAdapter from '../adapters/config/ConfigAdapter';
 
 function valid(object: any, key: string | number, type: string, required: boolean = true) {
   if (key in object) {
@@ -45,5 +46,9 @@ export default class AttributeConfigParser {
           throw new Error();
       }
     });
+  }
+
+  static async resolve(config: ConfigAdapter, context: ConfigContext) {
+    return this.compile(await config.get(context));
   }
 }
