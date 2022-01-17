@@ -2,7 +2,7 @@ import {
   FormInstance,
 } from 'antd';
 import { UserAttributes } from '../../adapters/users/UserAdapter';
-import AttributeInstance from '../AttributeInstance';
+import AttributeInstance from './AttributeInstance';
 
 // Type class for parsing form data.
 export default class AttributeConfig {
@@ -35,10 +35,17 @@ export default class AttributeConfig {
   );
 
   getAWSAttributes = (form:FormInstance) => {
-    const updatedUserAttributes: UserAttributes = this.configAttributes.reduce((acc, attr) => ({
-      ...acc,
-      [attr.attribute]: attr.serialize(form.getFieldValue(`attributes[${attr.attribute}]`)),
-    }), {});
+    const updatedUserAttributes: UserAttributes = this.configAttributes.reduce((acc, attr) => {
+      let value = form.getFieldValue(`attributes[${attr.attribute}]`);
+      if (attr.fromForm) {
+        value = attr.fromForm(form);
+      }
+      return ({
+        ...acc,
+        [attr.attribute]: attr.serialize(value),
+      });
+    }, {});
+
     return updatedUserAttributes;
   };
 }

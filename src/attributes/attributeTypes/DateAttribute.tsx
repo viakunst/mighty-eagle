@@ -6,7 +6,7 @@ import { UserAttributes } from '../../adapters/users/UserAdapter';
 import AttributeInstance from '../attributesClass/AttributeInstance';
 import AttributeConfigData from '../attributesClass/AttributeConfigData';
 
-export default function TextAttribute({
+export default function DateAttribute({
   Name,
   Attribute,
   Description,

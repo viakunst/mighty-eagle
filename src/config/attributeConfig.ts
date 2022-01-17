@@ -1,4 +1,8 @@
-import { TextAttribute, BooleanAttribute } from '../attributes/attributeTypes';
+import {
+  TextAttribute, BooleanAttribute,
+  DateAttribute, CompoundTextAttribute,
+  PhoneAttribute,
+} from '../attributes/attributeTypes';
 import AttributeConfig from '../attributes/attributesClass/AttributeConfig';
 
 // Name is the attribute primary key.
@@ -9,10 +13,16 @@ const basicAttributeConfig = new AttributeConfig([
     Attribute: 'email',
     Required: true,
   }),
-  TextAttribute({
+  PhoneAttribute({
     Name: 'Telefoonnummer',
     Attribute: 'phone_number',
     Required: true,
+  }),
+  CompoundTextAttribute({
+    Name: 'Volledige Naam',
+    Attribute: 'name',
+    Expression: '{{given_name}} {{family_name}}',
+    Description: 'Totale naam',
   }),
   TextAttribute({
     Name: 'Voornaam',
@@ -31,7 +41,15 @@ const basicAttributeConfig = new AttributeConfig([
   }),
 ]);
 
-const userAttributeConfig = basicAttributeConfig.extend([
+const userReadAttributeConfig = basicAttributeConfig.extend([
+  BooleanAttribute({
+    Name: 'Akkoord Beeldbeleid',
+    Attribute: 'custom:image_consent_2',
+    Description: 'Voor meer informatie, ga naar <..>',
+  }),
+]);
+
+const userUpdateAttributeConfig = basicAttributeConfig.extend([
   BooleanAttribute({
     Name: 'Akkoord Beeldbeleid',
     Attribute: 'custom:image_consent_2',
@@ -53,6 +71,6 @@ const adminUpdateUserAttributeConfig = basicAttributeConfig.extend([]);
 const adminCreateUserAttributeConfig = basicAttributeConfig.extend([]);
 
 export {
-  userAttributeConfig, adminCreateUserAttributeConfig,
+  userReadAttributeConfig, userUpdateAttributeConfig, adminCreateUserAttributeConfig,
   adminUpdateUserAttributeConfig, adminReadUserAttributeConfig,
 };

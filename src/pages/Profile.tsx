@@ -6,7 +6,7 @@ import {
 import '../style/Profile.css';
 import CognitoProfileAdapter from '../adapters/profile/CognitoProfileAdapter';
 import ProfileEdit from '../components/user-components/UserProfileEdit';
-import { userAttributeConfig } from '../config/attributeConfig';
+import { userReadAttributeConfig } from '../config/attributeConfig';
 import AdminMenu from '../components/admin-components/AdminMenu';
 import SignOutButton from '../components/user-components/SignOutButton';
 import OidcService from '../helpers/OidcService';
@@ -58,7 +58,8 @@ export default function Profile() {
       key: 'age',
     },
   ];
-  const columnData:any[] = userAttributeConfig.getColumnItems(userAttributes);
+
+  const columnData:any[] = userReadAttributeConfig.getColumnItems(userAttributes);
 
   return (
     <div className="profile card row">

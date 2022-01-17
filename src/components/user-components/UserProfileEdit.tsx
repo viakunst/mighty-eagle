@@ -4,7 +4,7 @@ import {
   Button, Form,
 } from 'antd';
 
-import { userAttributeConfig } from '../../config/attributeConfig';
+import { userUpdateAttributeConfig } from '../../config/attributeConfig';
 import OidcService from '../../helpers/OidcService';
 import ProfileAdapter from '../../adapters/profile/ProfileAdapter';
 import { UserAttributes } from '../../adapters/users/UserAdapter';
@@ -32,10 +32,12 @@ export default function ProfileEdit(props:UserAttributesProps) {
   const { userAttributes, onAttributesUpdate } = props;
 
   // flush to form.
-  const formItems = userAttributeConfig.getFormItems(userAttributes);
+  const formItems = userUpdateAttributeConfig.getFormItems(userAttributes);
 
   const onFinish = async () => {
-    const updatedUserAttributes = userAttributeConfig.getAWSAttributes(form);
+    const updatedUserAttributes = userUpdateAttributeConfig.getAWSAttributes(form);
+    console.log(updatedUserAttributes);
+
     const accessToken = userData.user?.access_token ?? OidcService.throwOnMissingAuth();
     await props.profile.updateUser(accessToken, updatedUserAttributes);
     onAttributesUpdate();
