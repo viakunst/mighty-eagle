@@ -9,6 +9,10 @@ export default class LocalConfigAdapter implements ConfigAdapter {
     this.config = config;
   }
 
+  canUpdate(): boolean {
+    return false;
+  }
+
   update(): Promise<void> {
     throw new Error('updating the hardcoded configuration is not supported');
   }
