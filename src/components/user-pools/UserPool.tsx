@@ -284,9 +284,11 @@ export function UserPool() {
       ),
     },
   ];
+
   const {
     pools, attributes, users, selectedUser, userSelected, activeUserPool, modelTitle,
   } = state;
+
   return (
     <div>
 

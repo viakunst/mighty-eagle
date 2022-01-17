@@ -47,7 +47,7 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
       message.info('Account succesvol bijgewerkt.');
       onAttributesUpdate();
     } catch (e) {
-      message.info('Probleem met het bijwerken van dit account.');
+      message.info(`Probleem met het bijwerken van dit account.\n ${e}`);
     }
   };
 

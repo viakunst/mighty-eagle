@@ -1,4 +1,4 @@
-import { TextAttribute, BooleanAttribute } from '../attributes';
+import { TextAttribute, BooleanAttribute, DateAttribute } from '../attributes';
 import AttributeConfig from '../attributesClass/AttributeConfig';
 
 // Name is the attribute primary key.
@@ -7,22 +7,27 @@ const basicAttributeConfig = new AttributeConfig([
   TextAttribute({
     Name: 'E-mail',
     Attribute: 'email',
+    Required: true,
   }),
   TextAttribute({
     Name: 'Telefoonnummer',
     Attribute: 'phone_number',
+    Required: true,
   }),
   TextAttribute({
     Name: 'Voornaam',
     Attribute: 'given_name',
+    Required: true,
   }),
   TextAttribute({
     Name: 'Achternaam',
     Attribute: 'family_name',
+    Required: true,
   }),
-  TextAttribute({
+  DateAttribute({
     Name: 'Geboortedatum',
     Attribute: 'birthdate',
+    Required: true,
   }),
 ]);
 

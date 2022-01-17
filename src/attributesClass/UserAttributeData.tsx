@@ -1,5 +1,4 @@
 import { AttributeType } from '@aws-sdk/client-cognito-identity-provider';
-import { userAttributeConfig } from '../config/attributeConfig';
 
 // Type class for parsing profile data.
 export default class UserAttributesData {
@@ -13,15 +12,6 @@ export default class UserAttributesData {
       this.userAttributes = {};
     }
   }
-
-  parseUserData = (userData:any) => {
-    if (userData.user) {
-      const profile = userData.user?.profile;
-      userAttributeConfig.configAttributes.forEach((att) => {
-        this.addAttribute(att.getAttribute(), profile[att.getAttribute()]);
-      });
-    }
-  };
 
   parseAWS = (data:AttributeType[]) => {
     data.forEach((att) => {
