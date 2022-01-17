@@ -5,4 +5,5 @@ export default interface AttributeConfigData {
   Required?: boolean,
   Placeholder?: string,
   Expression?: string,
+  Message?: string,
 }

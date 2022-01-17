@@ -12,6 +12,7 @@ export default function EmailAttribute({
   Description,
   Required,
   Placeholder,
+  Message,
 }: AttributeConfigData): AttributeInstance<string> {
   return {
     attribute: Attribute,
@@ -30,7 +31,9 @@ export default function EmailAttribute({
         validateTrigger={['onChange', 'onBlur']}
         rules={[{
           required: false,
-          whitespace: true,
+          whitespace: false,
+          type: 'email',
+          message: Message,
         }]}
         tooltip={Description ?? undefined}
       >

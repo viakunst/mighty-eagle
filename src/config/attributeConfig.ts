@@ -1,17 +1,19 @@
 import {
   TextAttribute, BooleanAttribute,
   DateAttribute, CompoundTextAttribute,
-  PhoneAttribute,
+  PhoneAttribute, EmailAttribute,
 } from '../attributes/attributeTypes';
 import AttributeConfig from '../attributes/attributesClass/AttributeConfig';
 
 // Name is the attribute primary key.
 // These need to be unique for each attribute therefore.
 const basicAttributeConfig = new AttributeConfig([
-  TextAttribute({
+  EmailAttribute({
     Name: 'E-mail',
     Attribute: 'email',
     Required: true,
+    Message: 'De email is fout',
+    Placeholder: 'voorbeeld@email.com',
   }),
   PhoneAttribute({
     Name: 'Telefoonnummer',
