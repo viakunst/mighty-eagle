@@ -5,8 +5,9 @@ import {
 } from 'antd';
 
 import { userAttributeConfig } from '../../config/attributeConfig';
-import UserAttributeData from '../../attributesClass/UserAttributeData';
-import awsManager from '../../services/awsManager';
+import OidcService from '../../helpers/OidcService';
+import ProfileAdapter from '../../adapters/profile/ProfileAdapter';
+import { UserAttributes } from '../../adapters/users/UserAdapter';
 
 const formItemLayout = {
   labelCol: {
@@ -20,7 +21,8 @@ const formItemLayout = {
 };
 
 interface UserAttributesProps {
-  userAttributes: UserAttributeData;
+  profile: ProfileAdapter;
+  userAttributes: UserAttributes;
   onAttributesUpdate: () => Promise<void>;
 }
 
@@ -34,7 +36,8 @@ export default function ProfileEdit(props:UserAttributesProps) {
 
   const onFinish = async () => {
     const updatedUserAttributes = userAttributeConfig.getAWSAttributes(form);
-    await awsManager.update(userData, updatedUserAttributes);
+    const accessToken = userData.user?.access_token ?? OidcService.throwOnMissingAuth();
+    await props.profile.updateUser(accessToken, updatedUserAttributes);
     onAttributesUpdate();
   };
 

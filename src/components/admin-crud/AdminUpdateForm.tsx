@@ -4,14 +4,12 @@ import {
   Button, Form, message,
 } from 'antd';
 
-import { AdminUpdateUserAttributesCommand, UserType } from '@aws-sdk/client-cognito-identity-provider';
-import UserAttributeData from '../../attributesClass/UserAttributeData';
 import { adminCreateUserAttributeConfig, adminUpdateUserAttributeConfig } from '../../config/attributeConfig';
-import Cognito from '../../services/cognito';
+import UserAdapter, { User } from '../../adapters/users/UserAdapter';
 
 interface AdminUpdateProps {
-  userPoolId: string | null;
-  user: UserType | null;
+  userPool: UserAdapter;
+  user: User;
   onAttributesUpdate: () => Promise<void>;
 }
 
@@ -30,28 +28,22 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
   const [form] = Form.useForm();
 
   const {
-    userPoolId, user, onAttributesUpdate,
+    userPool, user, onAttributesUpdate,
   } = props;
-
-  const attributes = new UserAttributeData(user?.Attributes);
 
   const onFinish = async () => {
     const userAttributes = adminCreateUserAttributeConfig.getAWSAttributes(form);
     console.log(userAttributes);
     try {
-      await Cognito.client().send(new AdminUpdateUserAttributesCommand({
-        UserPoolId: userPoolId ?? undefined,
-        Username: user?.Username ?? '',
-        UserAttributes: userAttributes,
-      }));
+      await userPool.updateUser(user.username, userAttributes);
       message.info('Account succesvol bijgewerkt.');
       onAttributesUpdate();
-    } catch (e) {
-      message.info(`Probleem met het bijwerken van dit account.\n ${e}`);
+    } catch {
+      message.info('Probleem met het bijwerken van dit account.');
     }
   };
 
-  const formItems = adminUpdateUserAttributeConfig.getFormItems(attributes);
+  const formItems = adminUpdateUserAttributeConfig.getFormItems(user.userAttributes);
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
       <Form
@@ -59,7 +51,7 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
         wrapperCol={formItemLayout?.wrapperCol}
         form={form}
         onFinish={onFinish}
-        initialValues={{ userAttr: user?.Attributes }}
+        initialValues={{ userAttr: user.userAttributes }}
       >
         {formItems}
         <Form.Item wrapperCol={{

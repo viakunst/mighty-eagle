@@ -5,9 +5,15 @@ import {
   Button,
 } from 'antd';
 
-import Cognito from '../../services/cognito';
+import Cognito from '../../helpers/CognitoService';
+import OidcService from '../../helpers/OidcService';
+import ProfileAdapter from '../../adapters/profile/ProfileAdapter';
 
-export default function AdminMenu() {
+interface AdminMenuProps {
+  profile: ProfileAdapter;
+}
+
+export default function AdminMenu({ profile }: AdminMenuProps) {
   const [state, setState] = useState({
     admin: 'user',
   });
@@ -16,9 +22,10 @@ export default function AdminMenu() {
   useEffect(() => {
     // TO-DO: check if Cognito has his credentials.
 
-    Cognito.signIn(Cognito.getIdToken()).then(() => Cognito.getRole().then((value) => {
-      setState({ ...state, admin: value });
-    }).catch((err) => console.log('ERROR', err)));
+    Cognito.signIn(OidcService.getIdToken() ?? undefined).then(async () => {
+      const role = await profile.getRole();
+      setState({ ...state, admin: role });
+    });
   }, []);
 
   const {

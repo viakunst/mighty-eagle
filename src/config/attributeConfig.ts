@@ -1,5 +1,5 @@
-import { TextAttribute, BooleanAttribute, DateAttribute } from '../attributes';
-import AttributeConfig from '../attributesClass/AttributeConfig';
+import { TextAttribute, BooleanAttribute } from '../attributes/attributeTypes';
+import AttributeConfig from '../attributes/attributesClass/AttributeConfig';
 
 // Name is the attribute primary key.
 // These need to be unique for each attribute therefore.

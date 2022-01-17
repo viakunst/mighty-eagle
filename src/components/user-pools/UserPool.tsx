@@ -7,47 +7,39 @@ import {
 import Icon from '@ant-design/icons';
 import 'antd/dist/antd.css';
 
-import {
-  AdminEnableUserCommand,
-  AdminDisableUserCommand,
-  ListUserPoolsCommand,
-  ListUsersCommand,
-  AdminGetUserCommand,
-  UserPoolDescriptionType,
-  UserType,
-} from '@aws-sdk/client-cognito-identity-provider';
-
 import { ColumnsType } from 'antd/lib/table';
-import UserCRUD from '../admin-components/AdminCRUD';
-import Cognito from '../../services/cognito';
+import UserDetails from '../admin-components/UserDetails';
+import UserAdapter, { User, UserAttributes } from '../../adapters/users/UserAdapter';
+import CognitoUserAdapter from '../../adapters/users/CognitoUserAdapter';
 
 const { Option } = Select;
 
 const { Search } = Input;
 
 interface UserPoolUser {
-  username: any, attributes:any, status: any, created: any, modified: any, enabled: any
-}
-
-interface Attribute {
-  Name:string, Value:string
+  username: string,
+  userAttributes: UserAttributes,
+  status: string,
+  created: string,
+  modified: string,
+  enabled: string
 }
 
 interface UserPoolState {
   users: UserPoolUser[] | undefined,
-  pools: UserPoolDescriptionType[] | undefined,
+  pools: Record<string, UserAdapter>,
   attributes: any | undefined,
   searchAttribute: string | null,
-  activeUserPool: string | null,
+  activeUserPool: UserAdapter | null,
   userSelected: boolean,
-  selectedUser: UserType | null,
-  modelTitle: String,
+  selectedUser: User | null,
+  modelTitle: string,
 }
 
 export function UserPool() {
   const [state, setState] = useState<UserPoolState>({
     users: [],
-    pools: [],
+    pools: {},
     attributes: ['name', 'email'],
     searchAttribute: '',
     activeUserPool: null,
@@ -58,75 +50,51 @@ export function UserPool() {
 
   // componentDidMount
   useEffect(() => {
-    Cognito.client().send(new ListUserPoolsCommand({
-      MaxResults: 60,
-    })).then((response) => {
-      const pools = response.UserPools;
-      setState({ ...state, pools });
-    }).catch((err) => console.log('ERROR', err));
+    CognitoUserAdapter.fetchAll().then((pools) => setState({ ...state, pools }));
   }, []);
 
-  const flushAttributes = (attributes:Attribute[]) => {
-    const flushedAttributes:any = {};
-    attributes.forEach((attribute:Attribute) => {
-      flushedAttributes[attribute.Name] = attribute.Value;
-    });
-    return flushedAttributes;
-  };
-
-  /* eslint no-await-in-loop:0 */
-  // AWS does not allow you to fetch the entire list at once.
-  // So therefore I put a await in a loop to iterate through the entire user pool.
-  // This is going to be slow as the list goes toward 1000 users.
-  const fetchUsers = async (userPoolId: string | null, filter:string | undefined = undefined) => {
-    let users:any = [];
-    let response = await Cognito.client().send(new ListUsersCommand({
-      UserPoolId: userPoolId ?? undefined,
-      Filter: filter,
-    }));
-
-    users = users.concat(response.Users);
-    while (response.PaginationToken) {
-      response = await Cognito.client().send(new ListUsersCommand({
-        UserPoolId: userPoolId ?? undefined,
-        Filter: filter,
-        PaginationToken: response.PaginationToken,
-      }));
-      users = users.concat(response.Users);
-    }
-
-    return users.map((user:any, index:any) => ({
+  const fetchUsers = async (userPool: UserAdapter | null, filter?: string) => {
+    const users = await userPool?.listUsers(filter) ?? [];
+    return users.map((user, index) => ({
+      ...user,
       key: index,
-      attributes: flushAttributes(user.Attributes),
-      username: user.Username,
-      created: user.UserCreateDate,
-      status: user.UserStatus,
-      modified: user.UserLastModifiedDate,
-      enabled: user.Enabled ? 'enabled' : 'disabled',
+      enabled: user.enabled ? 'enabled' : 'disabled',
+      status: user.status ?? 'UNKNOWN',
+      created: user.created?.toLocaleDateString() ?? '',
+      modified: user.created?.toLocaleDateString() ?? '',
     }));
   };
 
   const setEnabled = async (username: string, enabled: boolean) => {
     const { activeUserPool } = state;
-    const params = {
-      Username: username,
-      UserPoolId: activeUserPool ?? undefined,
-    };
     try {
-      await Cognito.client().send(enabled
-        ? new AdminEnableUserCommand(params)
-        : new AdminDisableUserCommand(params));
+      await activeUserPool?.userSetEnabled(username, enabled);
       const users = await fetchUsers(activeUserPool);
       setState({ ...state, users });
     } catch (e) {
-      console.log('ERROR', e);
+      console.log('ERROR');
     }
   };
 
-  const handleChange = async (userPoolId: any) => {
-    const users = await fetchUsers(userPoolId);
-    console.log(users[0]);
-    setState({ ...state, users, activeUserPool: userPoolId });
+  const handleChange = async (userPoolId: string) => {
+    const { pools } = state;
+    const userPool = pools[userPoolId] ?? null;
+    const users = await fetchUsers(userPool);
+    setState({ ...state, users, activeUserPool: userPool });
+  };
+
+  const createUser = async (e: MouseEvent) => {
+    const {
+      activeUserPool,
+    } = state;
+    e.preventDefault();
+    if (activeUserPool) {
+      setState({
+        ...state,
+        selectedUser: null,
+        userSelected: true,
+      });
+    }
   };
 
   const openModal = async (e: MouseEvent, username: string) => {
@@ -134,34 +102,17 @@ export function UserPool() {
       activeUserPool,
     } = state;
     e.preventDefault();
-    if (username === 'create-user') {
-      if (activeUserPool) {
-        setState({
-          ...state,
-          selectedUser: null,
-          userSelected: true,
-        });
-      }
+    const user = await activeUserPool?.getUser(username);
+    if (user) {
+      console.log(user);
+
+      setState({
+        ...state,
+        selectedUser: user,
+        userSelected: true,
+      });
     } else {
-      try {
-        const response = await Cognito.client().send(new AdminGetUserCommand({
-          UserPoolId: activeUserPool ?? undefined,
-          Username: username,
-        }));
-        console.log(response);
-
-        const tempuser:UserType = response;
-        tempuser.Attributes = response.UserAttributes;
-        console.log(tempuser);
-
-        setState({
-          ...state,
-          selectedUser: tempuser,
-          userSelected: true,
-        });
-      } catch (err) {
-        console.log("Can't get user: ", err);
-      }
+      console.log("Can't get user");
     }
   };
 
@@ -173,7 +124,7 @@ export function UserPool() {
     });
   };
 
-  const updateModalTitle = (str: String) => {
+  const updateModalTitle = (str: string) => {
     setState({
       ...state,
       modelTitle: str,
@@ -206,16 +157,16 @@ export function UserPool() {
   const columns: ColumnsType<UserPoolUser> = [
     {
       title: 'Naam',
-      dataIndex: ['attributes', 'name'],
+      dataIndex: ['userAttributes', 'name'],
       key: 'name',
-      sorter: (a, b) => a.attributes.name.localeCompare(b.attributes.name),
+      sorter: (a, b) => a.userAttributes.name?.localeCompare(b.userAttributes.name ?? '') ?? 0,
       sortDirections: ['ascend', 'descend'],
     },
     {
       title: 'Email',
-      dataIndex: ['attributes', 'email'],
+      dataIndex: ['userAttributes', 'email'],
       key: 'email',
-      sorter: (a, b) => a.attributes.email.localeCompare(b.attributes.email),
+      sorter: (a, b) => a.userAttributes.email?.localeCompare(b.userAttributes.email ?? '') ?? 0,
       sortDirections: ['ascend', 'descend'],
     },
     {
@@ -232,7 +183,7 @@ export function UserPool() {
           value: 'RESET_REQUIRED',
         },
       ],
-      onFilter: (value, record) => record.status.indexOf(value) === 0,
+      onFilter: (value, record) => (typeof value === 'string' ? record.status.indexOf(value) === 0 : false),
       sorter: (a, b) => a.status.localeCompare(b.status),
       sortDirections: ['ascend', 'descend'],
     },
@@ -300,11 +251,8 @@ export function UserPool() {
             style={{ width: 200, marginBottom: 10 }}
             onChange={handleChange}
           >
-            {pools?.map((pool) => (
-              <Option
-                key={pool.Id ?? ''}
-                value={pool.Id ?? ''}
-              >{pool.Name}
+            {Object.values(pools).map((pool) => (
+              <Option key={pool.id} value={pool.id}>{pool.id}
               </Option>
             ))}
           </Select>
@@ -322,7 +270,7 @@ export function UserPool() {
             ))}
           </Select>
           <Search placeholder="input search text" allowClear onSearch={onSearch} style={{ width: 200 }} />
-          <Button type="primary" onClick={(e) => openModal(e.nativeEvent, 'create-user')}>
+          <Button type="primary" onClick={(e) => createUser(e.nativeEvent)}>
             Maak account aan.
           </Button>
 
@@ -334,7 +282,6 @@ export function UserPool() {
         </div>
 
         <Table pagination={false} columns={columns} dataSource={users} />
-
         <Modal
           title={modelTitle}
           destroyOnClose
@@ -342,12 +289,14 @@ export function UserPool() {
           onCancel={closeModal}
           footer={null}
         >
-          <UserCRUD
-            userPoolId={activeUserPool}
-            user={selectedUser}
-            onAttributesUpdate={onAttributesUpdate}
-            modelTitleUpdate={updateModalTitle}
-          />
+          { activeUserPool && (
+            <UserDetails
+              userPool={activeUserPool}
+              user={selectedUser}
+              onAttributesUpdate={onAttributesUpdate}
+              modelTitleUpdate={updateModalTitle}
+            />
+          ) }
         </Modal>
       </div>
     </div>
