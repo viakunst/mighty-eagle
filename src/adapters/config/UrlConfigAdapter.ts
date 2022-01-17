@@ -29,6 +29,6 @@ export default class LocalConfigAdapter implements ConfigAdapter {
       const data = await response.json();
       this.config = AttributeConfigParser.validate(data);
     }
-    return this.config.filter((attr) => attr.Context.includes(context));
+    return this.config.filter((attr) => attr.context.includes(context));
   }
 }

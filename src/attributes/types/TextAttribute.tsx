@@ -7,30 +7,30 @@ import AttributeInstance from '../AttributeInstance';
 import AttributeConfigData from '../AttributeConfigData';
 
 export default function TextAttribute({
-  Name,
-  Attribute,
-  Description,
+  name,
+  attribute,
+  description,
 }: AttributeConfigData): AttributeInstance<string> {
   return {
-    attribute: Attribute,
+    attribute,
     view: (userData: UserAttributes) => ({
-      title: Name,
-      key: Name,
-      value: (<>{userData[Attribute]}</>),
+      title: name,
+      key: name,
+      value: (<>{userData[attribute]}</>),
     }),
     edit: (value:string | null) => (
       <Form.Item
-        label={Name}
+        label={name}
         required={false}
-        key={Attribute}
-        name={`attributes[${Attribute}]`}
+        key={attribute}
+        name={`attributes[${attribute}]`}
         initialValue={value ?? undefined}
         validateTrigger={['onChange', 'onBlur']}
         rules={[{
           required: false,
           whitespace: true,
         }]}
-        tooltip={Description ?? undefined}
+        tooltip={description ?? undefined}
       >
         <Input style={{ width: '60%', marginRight: 8 }} />
       </Form.Item>

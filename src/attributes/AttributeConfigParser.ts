@@ -27,18 +27,18 @@ export default class AttributeConfigParser {
     }
     return data.flatMap((attribute) => {
       // validate keys
-      if (!valid(attribute, 'Type', 'string')) { return []; }
-      if (!valid(attribute, 'Name', 'string')) { return []; }
-      if (!valid(attribute, 'Context', 'object')) { return []; }
-      if (!valid(attribute, 'Attribute', 'string')) { return []; }
-      if (!valid(attribute, 'Description', 'string', false)) { return []; }
+      if (!valid(attribute, 'type', 'string')) { return []; }
+      if (!valid(attribute, 'name', 'string')) { return []; }
+      if (!valid(attribute, 'context', 'object')) { return []; }
+      if (!valid(attribute, 'attribute', 'string')) { return []; }
+      if (!valid(attribute, 'description', 'string', false)) { return []; }
 
       // validate type
-      if (!['string', 'boolean'].includes(attribute.Type)) { return []; }
+      if (!['string', 'boolean'].includes(attribute.type)) { return []; }
 
       // validate context
-      if (!(attribute.Context instanceof Array)) { return []; }
-      if (attribute.Context.every((elem: any) => elem in ConfigContext)) { return []; }
+      if (!(attribute.context instanceof Array)) { return []; }
+      if (attribute.context.every((elem: any) => elem in ConfigContext)) { return []; }
 
       // validated
       return [attribute];
@@ -47,7 +47,7 @@ export default class AttributeConfigParser {
 
   static compile(data: AttributeConfigData[]): AttributeInstance<any>[] {
     return data.map((attribute) => {
-      switch (attribute.Type) {
+      switch (attribute.type) {
         case 'string':
           return TextAttribute(attribute);
         case 'boolean':

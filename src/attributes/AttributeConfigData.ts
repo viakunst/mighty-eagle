@@ -1,9 +1,9 @@
 export default interface AttributeConfigData {
-  Type: string;
-  Context: ConfigContext[];
-  Name: string,
-  Attribute: string,
-  Description?: string,
+  type: string;
+  context: ConfigContext[];
+  name: string,
+  attribute: string,
+  description?: string,
 }
 
 export enum ConfigContext {

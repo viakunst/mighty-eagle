@@ -19,7 +19,7 @@ export default class LocalConfigAdapter implements ConfigAdapter {
 
   get(context: ConfigContext): Promise<AttributeConfigData[]> {
     return new Promise((resolve) => {
-      const filtered = this.config.filter((attr) => attr.Context.includes(context));
+      const filtered = this.config.filter((attr) => attr.context.includes(context));
       resolve(filtered);
     });
   }

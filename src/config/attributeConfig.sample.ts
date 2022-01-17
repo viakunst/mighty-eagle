@@ -12,26 +12,26 @@ const externalAttributeConfig = new UrlConfigAdapter('http://google.com/config.j
 // example: hardcoded
 const localAttributeConfig = new LocalConfigAdapter([
   {
-    Type: 'string',
-    Context: [
+    type: 'string',
+    context: [
       ConfigContext.USER_READ,
       ConfigContext.USER_MUTATE,
       ConfigContext.ADMIN_READ,
       ConfigContext.ADMIN_MUTATE,
     ],
-    Name: 'E-mail',
-    Attribute: 'email',
+    name: 'E-mail',
+    attribute: 'email',
   },
   {
-    Type: 'boolean',
-    Context: [
+    type: 'boolean',
+    context: [
       ConfigContext.USER_READ,
       ConfigContext.USER_MUTATE,
       ConfigContext.ADMIN_READ,
     ],
-    Name: 'Consent',
-    Attribute: 'consent',
-    Description: 'For more information, visit <..>',
+    name: 'Consent',
+    attribute: 'consent',
+    description: 'For more information, visit <..>',
   },
 ]);
 
