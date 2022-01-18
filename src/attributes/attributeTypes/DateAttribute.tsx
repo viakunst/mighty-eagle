@@ -32,27 +32,18 @@ function isValidDate(dateString:string):boolean {
 }
 
 export default function DateAttribute({
-  Name,
-  Attribute,
-  Description,
-  Required,
-  Placeholder,
+  Name, Attribute, Description, Required, Placeholder,
 }: AttributeConfigData): AttributeInstance<string> {
   const Base = TextAttribute({
-    Name,
-    Attribute,
-    Description,
-    Required,
-    Placeholder,
+    Name, Attribute, Description, Required, Placeholder,
   });
   Base.edit = (value:string | null) => (
     <Form.Item
+      name={`attributes[${Attribute}]`}
+      initialValue={value ?? undefined}
       label={Name}
       required={Required || false}
       key={Attribute}
-      name={`attributes[${Attribute}]`}
-      initialValue={value ?? undefined}
-      validateTrigger={['onChange', 'onBlur']}
       rules={[{
         whitespace: true,
       },
@@ -64,6 +55,7 @@ export default function DateAttribute({
         },
       },
       ]}
+      validateTrigger={['onChange', 'onBlur']}
       tooltip={Description ?? undefined}
     >
       <Input placeholder={Placeholder ?? undefined} style={{ width: '60%', marginRight: 8 }} />
