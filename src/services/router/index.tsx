@@ -10,38 +10,43 @@ import userManager from '../userManager';
 const WithAuth = makeAuthenticator({ userManager });
 
 export default function App() {
-  return (
-    <BrowserRouter>
-      <Switch>
-        <Route
-          path="/callback"
-          render={(routeProps) => (
-            <Callback
-              // sign in succes.
-              // Do after sign-in function here.
-              onSuccess={(user) => {
-                if (user.state != null) {
-                  //  placeholder
-                }
+  try {
+    return (
+      <BrowserRouter>
+        <Switch>
+          <Route
+            path="/callback"
+            render={(routeProps) => (
+              <Callback
+                // sign in succes.
+                // Do after sign-in function here.
+                onSuccess={(user) => {
+                  if (user.state != null) {
+                    //  placeholder
+                  }
 
-                console.log('succes');
+                  console.log('succes');
 
-                // Instantly identify the user in the identity pool and request credentials.
-                OidcService.saveIdToken(user.id_token);
-                // `user.state` will reflect the state that was passed in via signinArgs.
-                routeProps.history.push('/');
-              }}
-              onError={(error) => {
-                console.log(`Authorization failed. ${error}`);
-              }}
-              userManager={userManager}
-            />
-          )}
-        />
-        <Route path="/admin" exact component={WithAuth(ProfileAdmin)} />
-        <Route path="/" exact component={WithAuth(Profile)} />
-        <Route path="/" component={Error404} />
-      </Switch>
-    </BrowserRouter>
-  );
+                  // Instantly identify the user in the identity pool and request credentials.
+                  OidcService.saveIdToken(user.id_token);
+                  // `user.state` will reflect the state that was passed in via signinArgs.
+                  routeProps.history.push('/');
+                }}
+                onError={(error) => {
+                  console.log(`Authorization failed. ${error}`);
+                }}
+                userManager={userManager}
+              />
+            )}
+          />
+          <Route path="/admin" exact component={WithAuth(ProfileAdmin)} />
+          <Route path="/" exact component={WithAuth(Profile)} />
+          <Route path="/" component={Error404} />
+        </Switch>
+      </BrowserRouter>
+    );
+  } catch {
+    window.localStorage.clear();
+    return <Route path="/" />;
+  }
 }
