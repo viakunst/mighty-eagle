@@ -27,11 +27,6 @@ export default function TextAttribute({
         key={Attribute}
         name={`attributes[${Attribute}]`}
         initialValue={value ?? undefined}
-        validateTrigger={['onChange', 'onBlur']}
-        rules={[{
-          required: false,
-          whitespace: true,
-        }]}
         tooltip={Description ?? undefined}
       >
         <Input placeholder={Placeholder ?? undefined} style={{ width: '60%', marginRight: 8 }} />
