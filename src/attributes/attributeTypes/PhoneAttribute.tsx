@@ -29,8 +29,7 @@ export default function EmailAttribute({
         initialValue={value ?? undefined}
         validateTrigger={['onChange', 'onBlur']}
         rules={[{
-          required: false,
-          whitespace: true,
+          whitespace: false,
         },
         {
           validator: async (rule, input) => {

@@ -36,7 +36,6 @@ export default function ProfileEdit(props:UserAttributesProps) {
 
   const onFinish = async () => {
     const updatedUserAttributes = userUpdateAttributeConfig.getAWSAttributes(form);
-    console.log(updatedUserAttributes);
 
     const accessToken = userData.user?.access_token ?? OidcService.throwOnMissingAuth();
     await props.profile.updateUser(accessToken, updatedUserAttributes);

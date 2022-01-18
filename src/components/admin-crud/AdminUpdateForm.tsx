@@ -33,7 +33,6 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
 
   const onFinish = async () => {
     const userAttributes = adminCreateUserAttributeConfig.getAWSAttributes(form);
-    console.log(userAttributes);
     try {
       await userPool.updateUser(user.username, userAttributes);
       message.info('Account succesvol bijgewerkt.');
