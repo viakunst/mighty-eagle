@@ -104,8 +104,6 @@ export function UserPool() {
     e.preventDefault();
     const user = await activeUserPool?.getUser(username);
     if (user) {
-      console.log(user);
-
       setState({
         ...state,
         selectedUser: user,
@@ -148,7 +146,6 @@ export function UserPool() {
   const onSearch = async (value:string) => {
     const { searchAttribute, activeUserPool } = state;
     const filterString = `${searchAttribute}^="${value}"`;
-    console.log(filterString);
     const users = await fetchUsers(activeUserPool, filterString);
 
     setState({ ...state, users });
@@ -235,9 +232,11 @@ export function UserPool() {
       ),
     },
   ];
+
   const {
     pools, attributes, users, selectedUser, userSelected, activeUserPool, modelTitle,
   } = state;
+
   return (
     <div>
 

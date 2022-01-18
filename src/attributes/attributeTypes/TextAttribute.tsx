@@ -10,6 +10,8 @@ export default function TextAttribute({
   Name,
   Attribute,
   Description,
+  Required,
+  Placeholder,
 }: AttributeConfigData): AttributeInstance<string> {
   return {
     attribute: Attribute,
@@ -21,18 +23,13 @@ export default function TextAttribute({
     edit: (value:string | null) => (
       <Form.Item
         label={Name}
-        required={false}
+        required={Required || false}
         key={Attribute}
         name={`attributes[${Attribute}]`}
         initialValue={value ?? undefined}
-        validateTrigger={['onChange', 'onBlur']}
-        rules={[{
-          required: false,
-          whitespace: true,
-        }]}
         tooltip={Description ?? undefined}
       >
-        <Input style={{ width: '60%', marginRight: 8 }} />
+        <Input placeholder={Placeholder ?? undefined} style={{ width: '60%', marginRight: 8 }} />
       </Form.Item>
     ),
     parse: (serialized: string) => serialized,
