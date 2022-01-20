@@ -7,7 +7,7 @@ import { ConfigContext } from '../attributes/AttributeConfigData';
 const urlAttributeConfig = new UrlConfigAdapter('/config.json');
 
 // example: json from url (different origin, cors enabled)
-const externalAttributeConfig = new UrlConfigAdapter('http://google.com/config.json', false);
+const externalAttributeConfig = new UrlConfigAdapter('https://google.com/config.json', false);
 
 // example: hardcoded
 const localAttributeConfig = new LocalConfigAdapter([
@@ -21,6 +21,7 @@ const localAttributeConfig = new LocalConfigAdapter([
     ],
     name: 'E-mail',
     attribute: 'email',
+    options: {},
   },
   {
     type: 'boolean',
@@ -32,6 +33,7 @@ const localAttributeConfig = new LocalConfigAdapter([
     name: 'Consent',
     attribute: 'consent',
     description: 'For more information, visit <..>',
+    options: {},
   },
 ]);
 

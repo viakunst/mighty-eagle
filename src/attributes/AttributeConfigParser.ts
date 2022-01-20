@@ -35,6 +35,7 @@ export default class AttributeConfigParser {
       if (!valid(attribute, 'context', 'object')) { return []; }
       if (!valid(attribute, 'attribute', 'string')) { return []; }
       if (!valid(attribute, 'description', 'string', false)) { return []; }
+      if (!valid(attribute, 'options', 'object', false)) { return []; }
 
       // validate type
       if (!['string', 'boolean', 'date', 'phone', 'email', 'compound'].includes(attribute.type)) { return []; }
