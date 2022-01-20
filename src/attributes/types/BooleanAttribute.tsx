@@ -10,7 +10,7 @@ export default function BooleanAttribute({
   name,
   attribute,
   description,
-}: AttributeConfigData): AttributeInstance<boolean> {
+}: AttributeConfigData<void>): AttributeInstance<boolean> {
   return {
     attribute,
     view: (userData: UserAttributes) => {

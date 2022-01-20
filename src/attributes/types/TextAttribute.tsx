@@ -6,11 +6,20 @@ import { UserAttributes } from '../../adapters/users/UserAdapter';
 import AttributeInstance from '../AttributeInstance';
 import AttributeConfigData from '../AttributeConfigData';
 
+export interface TextOptions {
+  required: boolean,
+  placeholder: string,
+}
+
 export default function TextAttribute({
   name,
   attribute,
   description,
-}: AttributeConfigData): AttributeInstance<string> {
+  options: {
+    required,
+    placeholder,
+  },
+}: AttributeConfigData<TextOptions>): AttributeInstance<string> {
   return {
     attribute,
     view: (userData: UserAttributes) => ({
@@ -21,7 +30,7 @@ export default function TextAttribute({
     edit: (value:string | null) => (
       <Form.Item
         label={name}
-        required={false}
+        required={required || false}
         key={attribute}
         name={`attributes[${attribute}]`}
         initialValue={value ?? undefined}
@@ -32,7 +41,7 @@ export default function TextAttribute({
         }]}
         tooltip={description ?? undefined}
       >
-        <Input style={{ width: '60%', marginRight: 8 }} />
+        <Input placeholder={placeholder ?? undefined} style={{ width: '60%', marginRight: 8 }} />
       </Form.Item>
     ),
     parse: (serialized: string) => serialized,

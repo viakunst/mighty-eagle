@@ -1,7 +1,7 @@
-import AttributeConfigData, { ConfigContext } from '../../attributes/AttributeConfigData';
+import { AttributeConfigDefinition, ConfigContext } from '../../attributes/AttributeConfigData';
 
 export default interface ConfigAdapter {
   canUpdate(): boolean;
-  update(context: ConfigContext, config: AttributeConfigData[]): Promise<void>;
-  get(context: ConfigContext): Promise<AttributeConfigData[]>;
+  update(context: ConfigContext, config: AttributeConfigDefinition): Promise<void>;
+  get(context: ConfigContext): Promise<AttributeConfigDefinition>;
 }

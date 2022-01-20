@@ -1,7 +1,10 @@
-import { BooleanAttribute, TextAttribute } from './types';
-import AttributeConfigData, { ConfigContext } from './AttributeConfigData';
+import {
+  BooleanAttribute, CompoundTextAttribute, DateAttribute, PhoneAttribute, TextAttribute,
+} from './types';
+import { AttributeConfigDefinition, ConfigContext } from './AttributeConfigData';
 import AttributeInstance from './AttributeInstance';
 import ConfigAdapter from '../adapters/config/ConfigAdapter';
+import EmailAttribute from './types/PhoneAttribute';
 
 function valid(object: any, key: string | number, type: string, required: boolean = true) {
   if (key in object) {
@@ -21,7 +24,7 @@ export default class AttributeConfigParser {
     return this.compile(attrs);
   }
 
-  static validate(data: any): AttributeConfigData[] {
+  static validate(data: any): AttributeConfigDefinition {
     if (!(data instanceof Array)) {
       return [];
     }
@@ -34,7 +37,7 @@ export default class AttributeConfigParser {
       if (!valid(attribute, 'description', 'string', false)) { return []; }
 
       // validate type
-      if (!['string', 'boolean'].includes(attribute.type)) { return []; }
+      if (!['string', 'boolean', 'date', 'phone', 'email', 'compound'].includes(attribute.type)) { return []; }
 
       // validate context
       if (!(attribute.context instanceof Array)) { return []; }
@@ -45,13 +48,21 @@ export default class AttributeConfigParser {
     });
   }
 
-  static compile(data: AttributeConfigData[]): AttributeInstance<any>[] {
+  static compile(data: AttributeConfigDefinition): AttributeInstance<any>[] {
     return data.map((attribute) => {
       switch (attribute.type) {
         case 'string':
           return TextAttribute(attribute);
         case 'boolean':
           return BooleanAttribute(attribute);
+        case 'date':
+          return DateAttribute(attribute);
+        case 'phone':
+          return PhoneAttribute(attribute);
+        case 'email':
+          return EmailAttribute(attribute);
+        case 'compound':
+          return CompoundTextAttribute(attribute);
         default:
           throw new Error();
       }

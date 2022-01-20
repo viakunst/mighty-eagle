@@ -1,10 +1,14 @@
-export default interface AttributeConfigData {
-  type: string;
-  context: ConfigContext[];
+export default interface AttributeConfigData<T> {
   name: string,
   attribute: string,
   description?: string,
+  options: T
 }
+
+export type AttributeConfigDefinition = (AttributeConfigData<any> & {
+  type: string;
+  context: ConfigContext[];
+})[];
 
 export enum ConfigContext {
   USER_READ = 'USER_READ',

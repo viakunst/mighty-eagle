@@ -1,4 +1,4 @@
-import AttributeConfigData, { ConfigContext } from '../../attributes/AttributeConfigData';
+import { AttributeConfigDefinition, ConfigContext } from '../../attributes/AttributeConfigData';
 import AttributeConfigParser from '../../attributes/AttributeConfigParser';
 import ConfigAdapter from './ConfigAdapter';
 
@@ -8,7 +8,7 @@ export default class LocalConfigAdapter implements ConfigAdapter {
 
   sameOrigin: boolean;
 
-  config?: AttributeConfigData[];
+  config?: AttributeConfigDefinition;
 
   constructor(url: string, sameOrigin: boolean = true) {
     this.url = url;
@@ -23,7 +23,7 @@ export default class LocalConfigAdapter implements ConfigAdapter {
     throw new Error('updating the hardcoded configuration is not supported');
   }
 
-  async get(context: ConfigContext): Promise<AttributeConfigData[]> {
+  async get(context: ConfigContext): Promise<AttributeConfigDefinition> {
     if (!this.config) {
       const response = await fetch(this.url, { mode: this.sameOrigin ? undefined : 'cors' });
       const data = await response.json();

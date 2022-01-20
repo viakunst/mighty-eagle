@@ -1,11 +1,11 @@
-import AttributeConfigData, { ConfigContext } from '../../attributes/AttributeConfigData';
+import { AttributeConfigDefinition, ConfigContext } from '../../attributes/AttributeConfigData';
 import ConfigAdapter from './ConfigAdapter';
 
 /* eslint class-methods-use-this:0 */
 export default class LocalConfigAdapter implements ConfigAdapter {
-  config: AttributeConfigData[];
+  config: AttributeConfigDefinition;
 
-  constructor(config: AttributeConfigData[]) {
+  constructor(config: AttributeConfigDefinition) {
     this.config = config;
   }
 
@@ -17,7 +17,7 @@ export default class LocalConfigAdapter implements ConfigAdapter {
     throw new Error('updating the hardcoded configuration is not supported');
   }
 
-  get(context: ConfigContext): Promise<AttributeConfigData[]> {
+  get(context: ConfigContext): Promise<AttributeConfigDefinition> {
     return new Promise((resolve) => {
       const filtered = this.config.filter((attr) => attr.context.includes(context));
       resolve(filtered);
