@@ -6,17 +6,21 @@ import {
 import '../style/Profile.css';
 import CognitoProfileAdapter from '../adapters/profile/CognitoProfileAdapter';
 import ProfileEdit from '../components/user-components/UserProfileEdit';
-import { userReadAttributeConfig } from '../config/attributeConfig';
+import attributeConfig from '../config/attributeConfig';
 import AdminMenu from '../components/admin-components/AdminMenu';
 import SignOutButton from '../components/user-components/SignOutButton';
 import OidcService from '../helpers/OidcService';
 import { UserAttributes } from '../adapters/users/UserAdapter';
+import AttributeConfig from '../attributes/AttributeConfig';
+import AttributeConfigParser from '../attributes/AttributeConfigParser';
+import { ConfigContext } from '../attributes/AttributeConfigData';
 
 export default function Profile() {
   const userData = useContext(UserData);
   const [visible, setVisible] = useState(false);
   const intialUserAttributeData: UserAttributes = {};
   const [userAttributes, setAttributes] = useState(intialUserAttributeData);
+  const [configInst, setConfigInst] = useState(new AttributeConfig([]));
   const profile = new CognitoProfileAdapter();
 
   const closeModal = () => {
@@ -44,7 +48,12 @@ export default function Profile() {
   };
 
   // This is a onmount effect.
-  useEffect(() => { parseUser(); }, []);
+  useEffect(() => {
+    AttributeConfigParser.resolve(attributeConfig, ConfigContext.ADMIN_MUTATE).then((config) => {
+      setConfigInst(new AttributeConfig(config));
+    });
+    parseUser();
+  }, []);
 
   const columns = [
     {
@@ -59,7 +68,7 @@ export default function Profile() {
     },
   ];
 
-  const columnData:any[] = userReadAttributeConfig.getColumnItems(userAttributes);
+  const columnData:any[] = configInst.getColumnItems(userAttributes);
 
   return (
     <div className="profile card row">

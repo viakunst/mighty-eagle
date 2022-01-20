@@ -2,29 +2,35 @@ import React from 'react';
 import { FormInstance } from 'antd';
 
 import { UserAttributes } from '../../adapters/users/UserAdapter';
-import AttributeInstance from '../attributesClass/AttributeInstance';
-import AttributeConfigData from '../attributesClass/AttributeConfigData';
-import AttributeExpression from '../attributesClass/AttributeExpression';
+import AttributeInstance from '../AttributeInstance';
+import AttributeConfigData from '../AttributeConfigData';
+import AttributeExpression from '../AttributeExpression';
+
+export interface CompoundOptions {
+  expression: string
+}
 
 export default function CompoundTextAttribute({
-  Name,
-  Attribute,
-  Expression,
-}: AttributeConfigData): AttributeInstance<string> {
+  name,
+  attribute,
+  options: {
+    expression,
+  },
+}: AttributeConfigData<CompoundOptions>): AttributeInstance<string> {
   return {
-    attribute: Attribute,
+    attribute,
     view: (userData: UserAttributes) => {
-      if (Expression) {
-        const expr = AttributeExpression({ Expression });
+      if (expression) {
+        const expr = AttributeExpression({ expression });
         return ({
-          title: Name,
-          key: Name,
+          title: name,
+          key: name,
           value: (<>{expr.eval(userData)}</>),
         });
       }
       return ({
-        title: Name,
-        key: Name,
+        title: name,
+        key: name,
         value: (<>Undefined expression</>),
       });
     },
@@ -35,8 +41,8 @@ export default function CompoundTextAttribute({
     parse: (serialized: string) => serialized,
     serialize: (value: string) => value,
     fromForm: (form: FormInstance) => {
-      if (Expression) {
-        const expr = AttributeExpression({ Expression });
+      if (expression) {
+        const expr = AttributeExpression({ expression });
         return expr.evalFromForm(form);
       }
       return 'Undefined expression';

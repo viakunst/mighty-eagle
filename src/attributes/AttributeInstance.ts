@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 import {
   FormInstance,
 } from 'antd';
-import { UserAttributes } from '../../adapters/users/UserAdapter';
+import { UserAttributes } from '../adapters/users/UserAdapter';
 
 export default interface AttributeInstance<T> {
   attribute: string;

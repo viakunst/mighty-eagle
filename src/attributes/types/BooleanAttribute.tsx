@@ -3,37 +3,37 @@ import {
   Form, Checkbox,
 } from 'antd';
 import { UserAttributes } from '../../adapters/users/UserAdapter';
-import AttributeInstance from '../attributesClass/AttributeInstance';
-import AttributeConfigData from '../attributesClass/AttributeConfigData';
+import AttributeInstance from '../AttributeInstance';
+import AttributeConfigData from '../AttributeConfigData';
 
 export default function BooleanAttribute({
-  Name,
-  Attribute,
-  Description,
-}: AttributeConfigData): AttributeInstance<boolean> {
+  name,
+  attribute,
+  description,
+}: AttributeConfigData<void>): AttributeInstance<boolean> {
   return {
-    attribute: Attribute,
+    attribute,
     view: (userData: UserAttributes) => {
       let val;
-      if (userData[Attribute] === 'false') {
+      if (userData[attribute] === 'false') {
         val = <Checkbox defaultChecked={false} disabled />;
       } else {
         val = <> <Checkbox defaultChecked disabled /> </>;
       }
       return ({
-        title: Name,
-        key: Name,
+        title: name,
+        key: name,
         value: val,
       });
     },
     edit: (value:string | null) => (
       <Form.Item
-        label={Name}
-        name={`attributes[${Attribute}]`}
+        label={name}
+        name={`attributes[${attribute}]`}
         valuePropName="checked"
         initialValue={value === 'true'}
-        key={Attribute}
-        tooltip={Description ?? undefined}
+        key={attribute}
+        tooltip={description ?? undefined}
       >
         <Checkbox />
       </Form.Item>

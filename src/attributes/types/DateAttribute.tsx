@@ -2,9 +2,9 @@ import React from 'react';
 import {
   Form, Input,
 } from 'antd';
-import AttributeInstance from '../attributesClass/AttributeInstance';
-import AttributeConfigData from '../attributesClass/AttributeConfigData';
-import TextAttribute from './TextAttribute';
+import AttributeInstance from '../AttributeInstance';
+import AttributeConfigData from '../AttributeConfigData';
+import TextAttribute, { TextOptions } from './TextAttribute';
 
 function isValidDate(dateString:string):boolean {
   // dd/mm/yyyy pattern.
@@ -32,18 +32,18 @@ function isValidDate(dateString:string):boolean {
 }
 
 export default function DateAttribute({
-  Name, Attribute, Description, Required, Placeholder,
-}: AttributeConfigData): AttributeInstance<string> {
+  name, attribute, description, options: { required, placeholder },
+}: AttributeConfigData<TextOptions>): AttributeInstance<string> {
   const Base = TextAttribute({
-    Name, Attribute, Description, Required, Placeholder,
+    name, attribute, description, options: { required, placeholder },
   });
   Base.edit = (value:string | null) => (
     <Form.Item
-      name={`attributes[${Attribute}]`}
+      name={`attributes[${attribute}]`}
       initialValue={value ?? undefined}
-      label={Name}
-      required={Required || false}
-      key={Attribute}
+      label={name}
+      required={required || false}
+      key={attribute}
       rules={[{
         whitespace: true,
       },
@@ -56,9 +56,9 @@ export default function DateAttribute({
       },
       ]}
       validateTrigger={['onChange', 'onBlur']}
-      tooltip={Description ?? undefined}
+      tooltip={description ?? undefined}
     >
-      <Input placeholder={Placeholder ?? undefined} style={{ width: '60%', marginRight: 8 }} />
+      <Input placeholder={placeholder ?? undefined} style={{ width: '60%', marginRight: 8 }} />
     </Form.Item>
   );
   return Base;

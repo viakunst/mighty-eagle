@@ -1,7 +1,7 @@
 import {
   FormInstance,
 } from 'antd';
-import { UserAttributes } from '../../adapters/users/UserAdapter';
+import { UserAttributes } from '../adapters/users/UserAdapter';
 import AttributeInstance from './AttributeInstance';
 
 // Type class for parsing form data.

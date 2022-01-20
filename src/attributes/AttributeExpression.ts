@@ -1,13 +1,13 @@
 import { FormInstance } from 'antd';
-import { UserAttributes } from '../../adapters/users/UserAdapter';
+import { UserAttributes } from '../adapters/users/UserAdapter';
 
 interface ExpressionConfig {
-  Expression: string,
+  expression: string,
 }
 
 interface ExpressionPart {
-  Value: string,
-  Attribute: string | null,
+  value: string,
+  attribute: string | null,
 }
 
 interface ExpressionInstance {
@@ -25,51 +25,51 @@ function getSplitExpression(expr: string, arr: ExpressionPart[] | null): Express
   }
 
   if (openIndex >= 0 && closeIndex >= 0) {
-    ret.push({ Value: expr.substr(0, openIndex), Attribute: null });
-    ret.push({ Value: 'unknown', Attribute: expr.substr(openIndex + 2, closeIndex - openIndex - 2) });
+    ret.push({ value: expr.substr(0, openIndex), attribute: null });
+    ret.push({ value: 'unknown', attribute: expr.substr(openIndex + 2, closeIndex - openIndex - 2) });
     return getSplitExpression(expr.substr(closeIndex + 2), ret);
   }
-  ret.push({ Value: expr, Attribute: null });
+  ret.push({ value: expr, attribute: null });
   return ret;
 }
 
 export default function AttributeExpression({
-  Expression,
+  expression,
 }: ExpressionConfig): ExpressionInstance {
   return {
-    expression: Expression,
+    expression,
     eval: (userData: UserAttributes) => {
-      const splitExpr: ExpressionPart[] = getSplitExpression(Expression, null);
+      const splitExpr: ExpressionPart[] = getSplitExpression(expression, null);
       let str: string = '';
       splitExpr.forEach((part) => {
-        if (part.Attribute != null) {
-          if (userData[part.Attribute] != null) {
-            const va1r = userData[part.Attribute];
+        if (part.attribute != null) {
+          if (userData[part.attribute] != null) {
+            const va1r = userData[part.attribute];
             if (va1r != null) {
               str = str.concat(va1r);
             }
           } else {
-            str = str.concat(part.Value);
+            str = str.concat(part.value);
           }
         } else {
-          str = str.concat(part.Value);
+          str = str.concat(part.value);
         }
       });
       return str;
     },
     evalFromForm: (form: FormInstance) => {
-      const splitExpr: ExpressionPart[] = getSplitExpression(Expression, null);
+      const splitExpr: ExpressionPart[] = getSplitExpression(expression, null);
       let str: string = '';
       splitExpr.forEach((part) => {
-        if (part.Attribute != null) {
-          const value = form.getFieldValue(`attributes[${part.Attribute}]`);
+        if (part.attribute != null) {
+          const value = form.getFieldValue(`attributes[${part.attribute}]`);
           if (value != null) {
             str = str.concat(value);
           } else {
-            str = str.concat(part.Value);
+            str = str.concat(part.value);
           }
         } else {
-          str = str.concat(part.Value);
+          str = str.concat(part.value);
         }
       });
       return str;

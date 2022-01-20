@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Button, Form, message,
 } from 'antd';
 
-import { adminCreateUserAttributeConfig } from '../../config/attributeConfig';
+import attributeConfig from '../../config/attributeConfig';
 import UserAdapter from '../../adapters/users/UserAdapter';
+import AttributeConfigParser from '../../attributes/AttributeConfigParser';
+import { ConfigContext } from '../../attributes/AttributeConfigData';
+import AttributeConfig from '../../attributes/AttributeConfig';
 
 interface AdminCreateProps {
   userPool: UserAdapter;
@@ -30,9 +33,18 @@ const AdminCreateForm = (props:AdminCreateProps) => {
     userPool, onAttributesUpdate,
   } = props;
 
+  const [configInst, setConfigInst] = useState(new AttributeConfig([]));
+
+  // componentDidMount
+  useEffect(() => {
+    AttributeConfigParser.resolve(attributeConfig, ConfigContext.ADMIN_MUTATE).then((config) => {
+      setConfigInst(new AttributeConfig(config));
+    });
+  }, []);
+
   const onFinish = async () => {
     // Push attributes, that are actually editable, to list.
-    const createUserAttributes = adminCreateUserAttributeConfig.getAWSAttributes(form);
+    const createUserAttributes = configInst.getAWSAttributes(form);
     // Email is the hardcoded username.
     const username = form.getFieldValue('attributes[email]');
     try {
@@ -44,7 +56,7 @@ const AdminCreateForm = (props:AdminCreateProps) => {
     }
   };
 
-  const formItems = adminCreateUserAttributeConfig.getFormItems(null);
+  const formItems = configInst.getFormItems(null);
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
