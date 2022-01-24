@@ -9,6 +9,7 @@ import userManager from '../userManager';
 
 const WithAuth = makeAuthenticator({ userManager });
 
+// APP, top level entry point.
 export default function App() {
   return (
     <BrowserRouter>

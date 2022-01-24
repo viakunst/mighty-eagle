@@ -49,7 +49,7 @@ export default function Profile() {
 
   // This is a onmount effect.
   useEffect(() => {
-    AttributeConfigParser.resolve(attributeConfig, ConfigContext.ADMIN_MUTATE).then((config) => {
+    AttributeConfigParser.resolve(attributeConfig, ConfigContext.USER_READ).then((config) => {
       setConfigInst(new AttributeConfig(config));
     });
     parseUser();

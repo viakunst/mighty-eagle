@@ -1,10 +1,10 @@
 import {
-  BooleanAttribute, CompoundTextAttribute, DateAttribute, PhoneAttribute, TextAttribute,
+  BooleanAttribute, CompoundTextAttribute, DateAttribute,
+  PhoneAttribute, TextAttribute, EmailAttribute,
 } from './types';
-import { AttributeConfigDefinition, ConfigContext } from './AttributeConfigData';
+import { AttributeConfigDefinition, ConfigContext, AttributeTypes } from './AttributeConfigData';
 import AttributeInstance from './AttributeInstance';
 import ConfigAdapter from '../adapters/config/ConfigAdapter';
-import EmailAttribute from './types/PhoneAttribute';
 
 function valid(object: any, key: string | number, type: string, required: boolean = true) {
   if (key in object) {
@@ -38,7 +38,7 @@ export default class AttributeConfigParser {
       if (!valid(attribute, 'options', 'object', false)) { return []; }
 
       // validate type
-      if (!['string', 'boolean', 'date', 'phone', 'email', 'compound'].includes(attribute.type)) { return []; }
+      if (!Object.values(AttributeTypes).includes(attribute.type)) { return []; }
 
       // validate context
       if (!(attribute.context instanceof Array)) { return []; }
@@ -52,17 +52,17 @@ export default class AttributeConfigParser {
   static compile(data: AttributeConfigDefinition): AttributeInstance<any>[] {
     return data.map((attribute) => {
       switch (attribute.type) {
-        case 'string':
+        case AttributeTypes.TEXT:
           return TextAttribute(attribute);
-        case 'boolean':
+        case AttributeTypes.CHECKBOX:
           return BooleanAttribute(attribute);
-        case 'date':
+        case AttributeTypes.DATE:
           return DateAttribute(attribute);
-        case 'phone':
+        case AttributeTypes.PHONE:
           return PhoneAttribute(attribute);
-        case 'email':
+        case AttributeTypes.EMAIL:
           return EmailAttribute(attribute);
-        case 'compound':
+        case AttributeTypes.COMPOUND_TEXT:
           return CompoundTextAttribute(attribute);
         default:
           throw new Error();
