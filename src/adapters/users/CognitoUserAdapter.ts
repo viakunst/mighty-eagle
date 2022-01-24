@@ -44,11 +44,15 @@ export default class CognitoUserAdapter implements UserAdapter {
 
   async createUser(username: string, userAttributes: UserAttributes) {
     const awsAttributes: AttributeType[] = CognitoService.recordToAwsAttributes(userAttributes);
+
     // Random string. It is concat with Pass@, as it usually does not satisfy all AWS requirements.
-    const randomstring = Math.random().toString(36).slice(-8);
+    const { crypto } = window;
+    const array = new Uint32Array(10);
+    crypto.getRandomValues(array);
+
     await CognitoService.client().send(new AdminCreateUserCommand({
       DesiredDeliveryMediums: ['EMAIL'],
-      TemporaryPassword: `Pass@${randomstring}`,
+      TemporaryPassword: `Pass@${array.toString()}`,
       UserAttributes: awsAttributes,
       Username: username,
       UserPoolId: this.userPoolId,
