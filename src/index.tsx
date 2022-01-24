@@ -4,6 +4,7 @@ import './style/index.css';
 import App from './services/router';
 import reportWebVitals from './reportWebVitals';
 
+// App refers to the APP function in de router index.
 ReactDOM.render(
   <React.StrictMode>
     <App />

@@ -58,7 +58,7 @@ export default function DateAttribute({
       validateTrigger={['onChange', 'onBlur']}
       tooltip={description ?? undefined}
     >
-      <Input placeholder={placeholder ?? undefined} style={{ width: '60%', marginRight: 8 }} />
+      <Input placeholder={placeholder ?? undefined} style={{ width: '80%', marginRight: 8 }} />
     </Form.Item>
   );
   return Base;

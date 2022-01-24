@@ -14,12 +14,12 @@ import { ConfigContext } from '../../attributes/AttributeConfigData';
 
 const formItemLayout = {
   labelCol: {
-    xs: { span: 24 },
-    sm: { span: 8 },
+    xs: { span: 8, offset: 0 },
+    sm: { span: 8, offset: 0 },
   },
   wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 20 },
+    xs: { span: 30, offset: 0 },
+    sm: { span: 30, offset: 0 },
   },
 };
 
@@ -44,6 +44,7 @@ export default function ProfileEdit(props:UserAttributesProps) {
 
   // flush to form.
   const formItems = configInst.getFormItems(userAttributes);
+  console.log(configInst);
 
   const onFinish = async () => {
     const updatedUserAttributes = configInst.getAWSAttributes(form);
@@ -53,7 +54,7 @@ export default function ProfileEdit(props:UserAttributesProps) {
   };
 
   return (
-    <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+    <div style={{ padding: 0, background: '#fff', minHeight: 360 }}>
       <Form
         labelCol={formItemLayout?.labelCol}
         wrapperCol={formItemLayout?.wrapperCol}

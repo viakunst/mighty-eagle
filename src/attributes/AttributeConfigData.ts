@@ -16,3 +16,12 @@ export enum ConfigContext {
   ADMIN_READ = 'ADMIN_READ',
   ADMIN_MUTATE = 'ADMIN_MUTATE',
 }
+
+export enum AttributeTypes {
+  EMAIL = 'email',
+  TEXT = 'string',
+  CHECKBOX = 'boolean',
+  DATE = 'date',
+  PHONE = 'phone',
+  COMPOUND_TEXT = 'compound',
+}
