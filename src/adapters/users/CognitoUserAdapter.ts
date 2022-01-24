@@ -44,10 +44,11 @@ export default class CognitoUserAdapter implements UserAdapter {
 
   async createUser(username: string, userAttributes: UserAttributes) {
     const awsAttributes: AttributeType[] = CognitoService.recordToAwsAttributes(userAttributes);
+    // Random string. It is concat with Pass@, as it usually does not satisfy all AWS requirements.
+    const randomstring = Math.random().toString(36).slice(-8);
     await CognitoService.client().send(new AdminCreateUserCommand({
       DesiredDeliveryMediums: ['EMAIL'],
-      MessageAction: 'SUPPRESS',
-      TemporaryPassword: 'Password@111222',
+      TemporaryPassword: `Pass@${randomstring}`,
       UserAttributes: awsAttributes,
       Username: username,
       UserPoolId: this.userPoolId,
@@ -120,7 +121,7 @@ export default class CognitoUserAdapter implements UserAdapter {
       : new AdminDisableUserCommand(params));
   }
 
-  static async fetchAll(): Promise<Record<string, CognitoUserAdapter>> {
+  static async fetchAllUserpools(): Promise<Record<string, CognitoUserAdapter>> {
     const response = await CognitoService.client().send(new ListUserPoolsCommand({
       MaxResults: 60,
     }));
