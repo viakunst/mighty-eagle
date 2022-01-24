@@ -75,14 +75,16 @@ export function UserPool() {
   };
 
   const poolSelector = () => {
-    const { pools } = state;
+    const { pools, activeUserPool } = state;
     const usablePools = Object.values(pools).filter(
       (pool) => AdminConfig.allowedUserpools.includes(pool.id),
     );
 
     // If only 1 pool is allowed then instantly set this as the active one.
     if (usablePools.length === 1) {
-      handleChange(usablePools[0].id);
+      if (activeUserPool === null) {
+        handleChange(usablePools[0].id);
+      }
       return (<></>);
     }
 
