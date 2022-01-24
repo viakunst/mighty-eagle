@@ -1,7 +1,7 @@
 import {
   modifiedColumn, createdColumn, attributeColumn,
   statusColumn, enabledColumn, searchField,
-} from '../components/user-pools/UserPoolTableColumn';
+} from '../components/user-pools/UserPoolConfigData';
 
 const localAdminConfig = {
   allowedUserpools: ['Testing'],

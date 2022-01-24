@@ -11,8 +11,8 @@ import { ColumnsType } from 'antd/lib/table';
 import UserDetails from '../admin-components/UserDetails';
 import UserAdapter, { User } from '../../adapters/users/UserAdapter';
 import CognitoUserAdapter from '../../adapters/users/CognitoUserAdapter';
-import UserPoolUser from './UserPoolTableColumn';
-import localAdminConfig from '../../config/adminConfig';
+import UserPoolUser from './UserPoolConfigData';
+import AdminConfig from '../../config/adminConfig';
 
 const { Search } = Input;
 
@@ -53,7 +53,6 @@ export function UserPool() {
   useEffect(() => {
     CognitoUserAdapter.fetchAllUserpools().then((pools) => {
       setState({ ...state, pools });
-      console.log(pools);
     });
   }, []);
 
@@ -78,7 +77,7 @@ export function UserPool() {
   const poolSelector = () => {
     const { pools } = state;
     const usablePools = Object.values(pools).filter(
-      (pool) => localAdminConfig.allowedUserpools.includes(pool.id),
+      (pool) => AdminConfig.allowedUserpools.includes(pool.id),
     );
 
     // If only 1 pool is allowed then instantly set this as the active one.
@@ -171,8 +170,9 @@ export function UserPool() {
     setState({ ...state, users });
   };
 
+  // These are the columns of the table.
   const columns: ColumnsType<UserPoolUser> = [
-    ...localAdminConfig.tableFields,
+    ...AdminConfig.tableFields,
     {
       title: 'Action',
       key: 'action',
@@ -217,7 +217,7 @@ export function UserPool() {
             style={{ width: 200, marginBottom: 10 }}
             onChange={handleSearchAttribute}
           >
-            {localAdminConfig.searchFields}
+            {AdminConfig.searchFields}
           </Select>
           <Search placeholder="Zoek" allowClear onSearch={onSearch} style={{ width: 200 }} />
           <Button type="primary" onClick={(e) => createUser(e.nativeEvent)}>
