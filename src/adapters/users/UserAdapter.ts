@@ -8,6 +8,8 @@ export default interface UserAdapter {
   listUsers(filter?: string): Promise<User[]>;
   getUser(username: Username): Promise<User | null>;
   createUser(username: Username, userAttributes: UserAttributes): Promise<void>;
+  resendInvitation(user: User): Promise<void>;
+  forcePasswordReset(user: User): Promise<void>;
   deleteUser(username: Username): Promise<void>;
   updateUser(username: Username, userAttributes: UserAttributes): Promise<void>;
   userSetEnabled(username: Username, enabled: boolean): Promise<void>;

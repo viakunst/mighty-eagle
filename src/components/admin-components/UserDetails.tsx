@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Button,
+  Button, message,
 } from 'antd';
 import UserCreateForm from '../admin-crud/AdminCreateForm';
 import UserReadForm from '../admin-crud/AdminReadForm';
@@ -46,6 +46,45 @@ export default function UserDetails({
     }
   };
 
+  const resendInvitation = async () => {
+    if (user !== null) {
+      try {
+        await userPool.resendInvitation(user);
+        message.info('Email verstuurt');
+        onAttributesUpdate();
+      } catch {
+        message.info('Probleem met het versturen van de uitnodiging.');
+      }
+    }
+  };
+
+  const resetPassword = async () => {
+    if (user !== null) {
+      try {
+        await userPool.forcePasswordReset(user);
+        message.info('Email verstuurt');
+        onAttributesUpdate();
+      } catch {
+        message.info('Probleem met het versturen van de uitnodiging.');
+      }
+    }
+  };
+
+  const invitationButtion = () => {
+    if (user?.status === 'CONFIRMED') {
+      return (
+        <Button type="primary" onClick={() => resetPassword()}>
+          Reset wachtwoord
+        </Button>
+      );
+    }
+    return (
+      <Button type="primary" onClick={() => resendInvitation()}>
+        Verstuur uitnodiging
+      </Button>
+    );
+  };
+
   return (
     <>
       <Conditional isVisible={() => mode === 'create'}>
@@ -63,6 +102,7 @@ export default function UserDetails({
           <Button type="primary" onClick={() => updateMode('delete')}>
             Verwijderen
           </Button>
+          {invitationButtion()}
           <UserReadForm
             user={user}
           />
