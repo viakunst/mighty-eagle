@@ -22,6 +22,7 @@ export default function TextAttribute({
 }: AttributeConfigData<TextOptions>): AttributeInstance<string> {
   return {
     attribute,
+    name,
     view: (userData: UserAttributes) => ({
       title: name,
       key: name,
@@ -44,6 +45,13 @@ export default function TextAttribute({
         <Input placeholder={placeholder ?? undefined} style={{ width: '80%', marginRight: 8 }} />
       </Form.Item>
     ),
+    menu: () => ({
+      title: name,
+      dataIndex: ['userAttributes', attribute],
+      key: attribute,
+      sorter: (a: any, b: any) => a.userAttributes[attribute]?.localeCompare(b.userAttributes[attribute] ?? '') ?? 0,
+      sortDirections: ['ascend', 'descend'],
+    }),
     parse: (serialized: string) => serialized,
     serialize: (value: string) => value,
   };

@@ -62,8 +62,7 @@ export default function UserDetails({
           </Button> | {' '}
           <Button type="primary" onClick={() => updateMode('delete')}>
             Verwijderen
-          </Button> | {' '}
-          {invitationButtion()}
+          </Button>
           <UserReadForm
             user={user}
           />
