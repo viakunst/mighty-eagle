@@ -22,9 +22,14 @@ export default class CognitoService {
 
   static config(): CognitoIdentityProviderClientConfig {
     const credentials: CognitoIdentityCredentials | null = JSON.parse(localStorage.getItem(CREDENTIALS) ?? 'null');
+    if (credentials) {
+      return {
+        region: REGION,
+        credentials: credentials ?? OidcService.throwOnMissingAuth(),
+      };
+    }
     return {
       region: REGION,
-      credentials: credentials ?? OidcService.throwOnMissingAuth(),
     };
   }
 

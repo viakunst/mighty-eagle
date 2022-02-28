@@ -1,18 +1,17 @@
 import {
   modifiedColumn, createdColumn, attributeColumn,
-  statusColumn, searchField,
+  statusColumn, enabledColumn, searchField,
 } from '../components/user-pools/UserPoolConfigData';
 
 const localAdminConfig = {
-  allowedUserpools: ['ViaKunst Accounts', 'Testing'],
+  allowedUserpools: ['ViaKunst Accounts'],
   tableFields: [
     attributeColumn('E-mail', 'email'),
     attributeColumn('Naam', 'name'),
-    attributeColumn('Beeldbeleid', 'custom:image_consent'),
     statusColumn(),
     createdColumn(),
     modifiedColumn(),
-    // enabledColumn(),
+    enabledColumn(),
   ],
   searchFields: [
     searchField('E-mail', 'email'),

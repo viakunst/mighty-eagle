@@ -15,10 +15,10 @@ export default function BooleanAttribute({
     attribute,
     view: (userData: UserAttributes) => {
       let val;
-      if (userData[attribute] === 'false') {
-        val = <Checkbox defaultChecked={false} disabled />;
-      } else {
+      if (userData[attribute] === 'true') {
         val = <> <Checkbox defaultChecked disabled /> </>;
+      } else {
+        val = <Checkbox defaultChecked={false} disabled />;
       }
       return ({
         title: name,
