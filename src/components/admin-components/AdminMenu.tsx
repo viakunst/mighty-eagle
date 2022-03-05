@@ -44,5 +44,5 @@ export default function AdminMenu({ profile }: AdminMenuProps) {
     );
   }
 
-  return (<>no admin</>);
+  return (<></>);
 }

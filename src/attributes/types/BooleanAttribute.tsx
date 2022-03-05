@@ -13,12 +13,13 @@ export default function BooleanAttribute({
 }: AttributeConfigData<void>): AttributeInstance<boolean> {
   return {
     attribute,
+    name,
     view: (userData: UserAttributes) => {
       let val;
-      if (userData[attribute] === 'false') {
-        val = <Checkbox defaultChecked={false} disabled />;
-      } else {
+      if (userData[attribute] === 'true') {
         val = <> <Checkbox defaultChecked disabled /> </>;
+      } else {
+        val = <Checkbox defaultChecked={false} disabled />;
       }
       return ({
         title: name,
@@ -38,6 +39,13 @@ export default function BooleanAttribute({
         <Checkbox />
       </Form.Item>
     ),
+    menu: () => ({
+      title: name,
+      dataIndex: ['userAttributes', attribute],
+      key: attribute,
+      sorter: (a: any, b: any) => a.userAttributes[attribute]?.localeCompare(b.userAttributes[attribute] ?? '') ?? 0,
+      sortDirections: ['ascend', 'descend'],
+    }),
     parse: (serialized: string) => {
       switch (serialized) {
         case 'true': return true;

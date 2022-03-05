@@ -98,7 +98,7 @@ export default function UserDetails({
         <Conditional isVisible={() => mode === 'view'}>
           <Button type="primary" onClick={() => updateMode('edit')}>
             Bewerken
-          </Button>
+          </Button> | {' '}
           <Button type="primary" onClick={() => updateMode('delete')}>
             Verwijderen
           </Button>

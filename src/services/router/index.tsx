@@ -6,6 +6,7 @@ import Profile from '../../pages/Profile';
 import ProfileAdmin from '../../pages/ProfileAdmin';
 import Error404 from '../../pages/Error404';
 import userManager from '../userManager';
+import CognitoService from '../../helpers/CognitoService';
 
 const WithAuth = makeAuthenticator({ userManager });
 
@@ -22,13 +23,15 @@ export default function App() {
               // Do after sign-in function here.
               onSuccess={(user) => {
                 if (user.state != null) {
-                  //  placeholder
+                  // placeholder
                 }
 
                 console.log('succes');
 
                 // Instantly identify the user in the identity pool and request credentials.
                 OidcService.saveIdToken(user.id_token);
+                CognitoService.signIn(user.id_token);
+
                 // `user.state` will reflect the state that was passed in via signinArgs.
                 routeProps.history.push('/');
               }}

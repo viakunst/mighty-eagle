@@ -18,6 +18,8 @@ const localAttributeConfig = new LocalConfigAdapter([
       ConfigContext.USER_MUTATE,
       ConfigContext.ADMIN_READ,
       ConfigContext.ADMIN_MUTATE,
+      ConfigContext.ADMIN_MENU,
+      ConfigContext.ADMIN_MENU_SEARCHABLE,
     ],
     name: 'E-mail',
     attribute: 'email',
@@ -39,3 +41,8 @@ const localAttributeConfig = new LocalConfigAdapter([
 
 // dont forget to export your config!
 export default localAttributeConfig;
+
+// Allowed user pools
+export const localAdminConfig = {
+  allowedUserpools: ['pool name'],
+};

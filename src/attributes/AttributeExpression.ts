@@ -26,7 +26,7 @@ function getSplitExpression(expr: string, arr: ExpressionPart[] | null): Express
 
   if (openIndex >= 0 && closeIndex >= 0) {
     ret.push({ value: expr.substr(0, openIndex), attribute: null });
-    ret.push({ value: 'unknown', attribute: expr.substr(openIndex + 2, closeIndex - openIndex - 2) });
+    ret.push({ value: '', attribute: expr.substr(openIndex + 2, closeIndex - openIndex - 2) });
     return getSplitExpression(expr.substr(closeIndex + 2), ret);
   }
   ret.push({ value: expr, attribute: null });

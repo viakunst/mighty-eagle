@@ -9,15 +9,24 @@ import 'antd/dist/antd.css';
 
 import { ColumnsType } from 'antd/lib/table';
 import UserDetails from '../admin-components/UserDetails';
-import UserAdapter, { User } from '../../adapters/users/UserAdapter';
+import UserAdapter, { User, UserAttributes } from '../../adapters/users/UserAdapter';
 import CognitoUserAdapter from '../../adapters/users/CognitoUserAdapter';
-import UserPoolUser from './UserPoolConfigData';
-import AdminConfig from '../../config/adminConfig';
+
+import attributeConfig, { localAdminConfig } from '../../config/attributeConfig';
 import AttributeConfigParser from '../../attributes/AttributeConfigParser';
-import attributeConfig from '../../config/attributeConfig';
 import { ConfigContext } from '../../attributes/AttributeConfigData';
+import AttributeConfig from '../../attributes/AttributeConfig';
 
 const { Search } = Input;
+
+interface UserPoolUser {
+  username: string,
+  userAttributes: UserAttributes,
+  status: string,
+  created: string,
+  modified: string,
+  enabled: string
+}
 
 interface UserPoolState {
   users: UserPoolUser[] | undefined,
@@ -52,8 +61,23 @@ export function UserPool() {
     }));
   };
 
+  // Set config states
+  const [menuConfigInst, setMenuConfigInst] = useState(new AttributeConfig([]));
+  const [searchConfigInst, setSerachConfigInst] = useState(new AttributeConfig([]));
+
   // componentDidMount
   useEffect(() => {
+    // Get the menu configs.
+    AttributeConfigParser.resolve(attributeConfig, ConfigContext.ADMIN_MENU).then((config) => {
+      setMenuConfigInst(new AttributeConfig(config));
+    });
+
+    // Get the searchvar configs.
+    AttributeConfigParser.resolve(attributeConfig,
+      ConfigContext.ADMIN_MENU_SEARCHABLE).then((config) => {
+      setSerachConfigInst(new AttributeConfig(config));
+    });
+
     CognitoUserAdapter.fetchAllUserpools().then((pools) => {
       setState({ ...state, pools });
     });
@@ -80,7 +104,7 @@ export function UserPool() {
   const poolSelector = () => {
     const { pools, activeUserPool } = state;
     const usablePools = Object.values(pools).filter(
-      (pool) => AdminConfig.allowedUserpools.includes(pool.id),
+      (pool) => localAdminConfig.allowedUserpools.includes(pool.id),
     );
 
     // If only 1 pool is allowed then instantly set this as the active one.
@@ -199,6 +223,15 @@ export function UserPool() {
     setState({ ...state, searchAttribute });
   };
 
+  const searchField = (name: string, attribute: string) => (
+    <Select
+      key={attribute ?? ''}
+      value={attribute ?? ''}
+    >
+      {name}
+    </Select>
+  );
+
   const onSearch = async (value:string) => {
     const { searchAttribute, activeUserPool } = state;
     const filterString = `${searchAttribute}^="${value}"`;
@@ -210,9 +243,9 @@ export function UserPool() {
 
   // These are the columns of the table.
   const columns: ColumnsType<UserPoolUser> = [
-    ...AdminConfig.tableFields,
+    ...menuConfigInst.configAttributes.map((att) => att.menu()),
     {
-      title: 'Action',
+      title: 'Details',
       key: 'action',
       render: (text, record) => (
         <>
@@ -255,7 +288,7 @@ export function UserPool() {
             style={{ width: 200, marginBottom: 10 }}
             onChange={handleSearchAttribute}
           >
-            {AdminConfig.searchFields}
+            { searchConfigInst.configAttributes.map((att) => searchField(att.attribute, att.name))}
           </Select>
           <Search placeholder="Zoek" allowClear onSearch={onSearch} style={{ width: 200 }} />
           <Button type="primary" onClick={(e) => createUser(e.nativeEvent)}>

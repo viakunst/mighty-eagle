@@ -15,6 +15,8 @@ export enum ConfigContext {
   USER_MUTATE = 'USER_MUTATE',
   ADMIN_READ = 'ADMIN_READ',
   ADMIN_MUTATE = 'ADMIN_MUTATE',
+  ADMIN_MENU = 'ADMIN_MENU',
+  ADMIN_MENU_SEARCHABLE = 'SEARCHABLE',
 }
 
 export enum AttributeTypes {
@@ -24,4 +26,5 @@ export enum AttributeTypes {
   DATE = 'date',
   PHONE = 'phone',
   COMPOUND_TEXT = 'compound',
+  MENU_ATTRIBUTE = 'menu',
 }

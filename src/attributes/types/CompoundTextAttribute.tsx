@@ -19,6 +19,7 @@ export default function CompoundTextAttribute({
 }: AttributeConfigData<CompoundOptions>): AttributeInstance<string> {
   return {
     attribute,
+    name,
     view: (userData: UserAttributes) => {
       if (expression) {
         const expr = AttributeExpression({ expression });
@@ -38,6 +39,13 @@ export default function CompoundTextAttribute({
     edit: () => (
       <></>
     ),
+    menu: () => ({
+      title: name,
+      dataIndex: ['userAttributes', attribute],
+      key: attribute,
+      sorter: (a: any, b: any) => a.userAttributes[attribute]?.localeCompare(b.userAttributes[attribute] ?? '') ?? 0,
+      sortDirections: ['ascend', 'descend'],
+    }),
     parse: (serialized: string) => serialized,
     serialize: (value: string) => value,
     fromForm: (form: FormInstance) => {
