@@ -144,6 +144,39 @@ export function UserPool() {
     }
   };
 
+  const exportData = async (e: MouseEvent) => {
+    const {
+      activeUserPool,
+    } = state;
+    e.preventDefault();
+    if (activeUserPool) {
+      AttributeConfigParser.resolve(attributeConfig, ConfigContext.ADMIN_READ).then(
+        async (config) => {
+          const users = await activeUserPool.listUsers();
+
+          // create csv file
+          const data = [
+            config.map((attr) => attr.view({}).title),
+            ...users.map((user) => config.map((attr) => user.userAttributes[attr.attribute] ?? '')),
+          ];
+
+          // create csv file
+          let csv = '';
+          data.forEach((row) => {
+            csv += `${row.join(',')}\n`;
+          });
+
+          // create file download
+          const a = document.createElement('a');
+          a.download = 'users.csv';
+          a.rel = 'noopener';
+          a.href = `data:text/csv;charset=utf-8,${encodeURI(csv)}`;
+          setTimeout(() => { a.dispatchEvent(new MouseEvent('click')); }, 0);
+        },
+      );
+    }
+  };
+
   const openModal = async (e: MouseEvent, username: string) => {
     const {
       activeUserPool,
@@ -217,7 +250,7 @@ export function UserPool() {
       render: (text, record) => (
         <>
           <span>
-            <button type="button" onClick={(e) => openModal(e.nativeEvent, record.username)}> details</button>
+            <Button onClick={(e) => openModal(e.nativeEvent, record.username)}>Details</Button>
           </span>
           <span>
             <Icon
@@ -260,6 +293,9 @@ export function UserPool() {
           <Search placeholder="Zoek" allowClear onSearch={onSearch} style={{ width: 200 }} />
           <Button type="primary" onClick={(e) => createUser(e.nativeEvent)}>
             Maak account aan.
+          </Button>
+          <Button onClick={(e) => exportData(e.nativeEvent)}>
+            Exporteer gebruikers
           </Button>
 
           <Link to="/">
