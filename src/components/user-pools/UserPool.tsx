@@ -249,7 +249,7 @@ export function UserPool() {
       return (<></>);
     }
 
-    if (searchAttribute === null) {
+    if (searchAttribute?.length === 0) {
       handleSearchAttribute(searchConfigInst.configAttributes[0].attribute);
     }
 
