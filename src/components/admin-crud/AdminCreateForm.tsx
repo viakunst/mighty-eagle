@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import {
-  Button, Form, message,
+  Button, Form, message, Divider,
 } from 'antd';
 
 import attributeConfig from '../../config/attributeConfig';
@@ -60,6 +60,17 @@ const AdminCreateForm = (props:AdminCreateProps) => {
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+      <>
+        <div>
+          <h3>Hallo, admin!</h3>
+          <p> Deze functie maakt een nieuw account aan voor alle systemen
+            die ViaKunst gebruikt. Let dus op; dit is niet alleen een ledenlijst,
+            maar dus een lijst van volledige VK accounts.
+          </p>
+          <Divider />
+        </div>
+      </>
+
       <Form
         labelCol={formItemLayout?.labelCol}
         wrapperCol={formItemLayout?.wrapperCol}
