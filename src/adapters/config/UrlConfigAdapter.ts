@@ -27,7 +27,7 @@ export default class LocalConfigAdapter implements ConfigAdapter {
     if (!this.config) {
       const response = await fetch(this.url, { mode: this.sameOrigin ? undefined : 'cors' });
       const data = await response.json();
-      this.config = AttributeConfigParser.validate(data);
+      this.config = AttributeConfigParser.parse(data);
     }
     return this.config.filter((attr) => attr.context.includes(context));
   }

@@ -235,10 +235,43 @@ export function UserPool() {
   const onSearch = async (value:string) => {
     const { searchAttribute, activeUserPool } = state;
     const filterString = `${searchAttribute}^="${value}"`;
-    console.log(filterString);
     const users = await fetchUsers(activeUserPool, filterString);
-
     setState({ ...state, users });
+  };
+
+  const searchSelector = () => {
+    const { searchAttribute } = state;
+
+    // No searchable fields.
+    if (searchConfigInst.configAttributes.length === 0) {
+      return (<></>);
+    }
+
+    if (searchAttribute === null) {
+      handleSearchAttribute(searchConfigInst.configAttributes[0].attribute);
+    }
+
+    // One searchable field.
+    if (searchConfigInst.configAttributes.length === 1) {
+      return (
+        <Search placeholder="Zoek" allowClear onSearch={onSearch} style={{ width: 200 }} />
+      );
+    }
+
+    // Multiple Searchable fields.
+    return (
+      <>
+        <Select
+          defaultValue={searchConfigInst.configAttributes[0].attribute}
+          placeholder="Zoekveld"
+          style={{ width: 200, marginBottom: 10 }}
+          onChange={handleSearchAttribute}
+        >
+          { searchConfigInst.configAttributes.map((att) => searchField(att.name, att.attribute))}
+        </Select>
+        <Search placeholder="Zoek" allowClear onSearch={onSearch} style={{ width: 200 }} />
+      </>
+    );
   };
 
   // These are the columns of the table.
@@ -283,14 +316,7 @@ export function UserPool() {
 
         <div className="row">
           {poolSelector()}
-          <Select
-            placeholder="Zoekveld"
-            style={{ width: 200, marginBottom: 10 }}
-            onChange={handleSearchAttribute}
-          >
-            { searchConfigInst.configAttributes.map((att) => searchField(att.attribute, att.name))}
-          </Select>
-          <Search placeholder="Zoek" allowClear onSearch={onSearch} style={{ width: 200 }} />
+          {searchSelector()}
           <Button type="primary" onClick={(e) => createUser(e.nativeEvent)}>
             Maak account aan.
           </Button>
@@ -300,7 +326,7 @@ export function UserPool() {
 
           <Link to="/">
             <Button>
-              Annuleren
+              Ga terug
             </Button>
           </Link>
         </div>
