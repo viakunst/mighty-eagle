@@ -116,17 +116,19 @@ export function UserPool() {
     }
 
     return (
-      <Select
-        placeholder="Kies de gebruikersgroep."
-        style={{ width: 200, marginBottom: 10 }}
-        onChange={handleChange}
-      >
-        {Object.values(usablePools).map((pool) => (
-          <Select key={pool.id} value={pool.id}>
-            {pool.id}
-          </Select>
-        ))}
-      </Select>
+      <>
+        <Select
+          placeholder="Kies de gebruikersgroep."
+          style={{ width: 200, marginBottom: 10 }}
+          onChange={handleChange}
+        >
+          {Object.values(usablePools).map((pool) => (
+            <Select key={pool.id} value={pool.id}>
+              {pool.id}
+            </Select>
+          ))}
+        </Select>  | {' '}
+      </>
     );
   };
 
@@ -269,7 +271,7 @@ export function UserPool() {
         >
           { searchConfigInst.configAttributes.map((att) => searchField(att.name, att.attribute))}
         </Select>
-        <Search placeholder="Zoek" allowClear onSearch={onSearch} style={{ width: 200 }} />
+        <Search placeholder="Zoek" allowClear onSearch={onSearch} style={{ width: 200 }} /> | {' '}
       </>
     );
   };
@@ -319,11 +321,10 @@ export function UserPool() {
           {searchSelector()}
           <Button type="primary" onClick={(e) => createUser(e.nativeEvent)}>
             Maak account aan.
-          </Button>
+          </Button> | {' '}
           <Button onClick={(e) => exportData(e.nativeEvent)}>
             Exporteer gebruikers
-          </Button>
-
+          </Button> | {' '}
           <Link to="/">
             <Button>
               Ga terug

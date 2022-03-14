@@ -38,18 +38,21 @@ export default function EmailAttribute({
       {
         validator: async (rule, input) => {
           // Alleen nederlandse nummers tot nu toe.
-          if (input.substring(0, 4) !== '+316') {
-            return Promise.reject(new Error('Het nummer moet starten met +316.'));
+          if (input.substring(0, 1) !== '+') {
+            return Promise.reject(new Error('Het nummer moet starten met +. Internationale nummers zijn verplicht.'));
           }
-          const isnum = /^\d+$/.test(input.substring(4));
-
-          if (input.length > 4 && !isnum) {
+          const isnum = /^\d+$/.test(input.substring(2));
+          if (input.length > 2 && !isnum) {
             return Promise.reject(new Error('Het nummer bevat andere symbolen.'));
           }
-          if (!input || input.length !== 12) {
-            return Promise.reject(new Error('Het nummer is niet lang genoeg.'));
+          if (input.substring(0, 4) === '+316') {
+            if (input.length < 12 && input.length > 6) {
+              return Promise.reject(new Error('Het nummer is te kort.'));
+            }
+            if (input.length >= 13) {
+              return Promise.reject(new Error('Het nummer is te lang.'));
+            }
           }
-
           return Promise.resolve();
         },
       }]}
