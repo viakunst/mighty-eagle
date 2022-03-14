@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { UserData } from 'react-oidc';
 import {
-  Button, Form,
+  Button, Form, message,
 } from 'antd';
 
 import attributeConfig from '../../config/attributeConfig';
@@ -44,13 +44,18 @@ export default function ProfileEdit(props:UserAttributesProps) {
 
   // flush to form.
   const formItems = configInst.getFormItems(userAttributes);
-  console.log(configInst);
 
   const onFinish = async () => {
     const updatedUserAttributes = configInst.getAWSAttributes(form);
     const accessToken = userData.user?.access_token ?? OidcService.throwOnMissingAuth();
-    await props.profile.updateUser(accessToken, updatedUserAttributes);
-    onAttributesUpdate();
+
+    try {
+      await props.profile.updateUser(accessToken, updatedUserAttributes);
+      message.info('Account succesvol bijgewerkt.');
+      onAttributesUpdate();
+    } catch {
+      message.info('Probleem met het bijwerken van je account.');
+    }
   };
 
   return (
