@@ -236,6 +236,8 @@ export function UserPool() {
 
   const onSearch = async (value:string) => {
     const { searchAttribute, activeUserPool } = state;
+    console.log(value);
+    console.log(searchAttribute);
     const filterString = `${searchAttribute}^="${value}"`;
     const users = await fetchUsers(activeUserPool, filterString);
     setState({ ...state, users });
@@ -249,7 +251,8 @@ export function UserPool() {
       return (<></>);
     }
 
-    if (searchAttribute === null) {
+    console.log(searchAttribute);
+    if (searchAttribute?.length === 0) {
       handleSearchAttribute(searchConfigInst.configAttributes[0].attribute);
     }
 
