@@ -18,10 +18,9 @@ function valid(object: any, key: string | number, type: string, required: boolea
 }
 
 export default class AttributeConfigParser {
-  static parse(jsonConfig: string): AttributeInstance<any>[] {
-    const data = JSON.parse(jsonConfig);
-    const attrs = this.validate(data);
-    return this.compile(attrs);
+  static parse(jsonConfig: any): AttributeConfigDefinition {
+    const attrs = this.validate(jsonConfig.config);
+    return attrs;
   }
 
   static validate(data: any): AttributeConfigDefinition {
@@ -42,7 +41,10 @@ export default class AttributeConfigParser {
 
       // validate context
       if (!(attribute.context instanceof Array)) { return []; }
-      if (attribute.context.every((elem: any) => elem in ConfigContext)) { return []; }
+
+      if (!attribute.context.every((elem: any) => Object.values(ConfigContext).includes(elem))) {
+        return [];
+      }
 
       // validated
       return [attribute];

@@ -300,7 +300,7 @@ export function UserPool() {
 
           <Link to="/">
             <Button>
-              Annuleren
+              Ga terug
             </Button>
           </Link>
         </div>
