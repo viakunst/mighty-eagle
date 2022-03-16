@@ -10,9 +10,10 @@ function isValidDate(dateString:string):boolean {
   // dd/mm/yyyy pattern.
 
   // First check for the pattern
-  if (!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) {
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
     return false;
   }
+
   // Parse the date parts to integers
   const parts = dateString.split('/');
   const day = parseInt(parts[0], 10);
