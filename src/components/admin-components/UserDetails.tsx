@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Button, message,
+  Button, message, Space,
 } from 'antd';
 import UserCreateForm from '../admin-crud/AdminCreateForm';
 import UserReadForm from '../admin-crud/AdminReadForm';
@@ -96,13 +96,15 @@ export default function UserDetails({
       { user && (
       <>
         <Conditional isVisible={() => mode === 'view'}>
-          <Button type="primary" onClick={() => updateMode('edit')}>
-            Bewerken
-          </Button> | {' '}
-          <Button type="primary" onClick={() => updateMode('delete')}>
-            Verwijderen
-          </Button>
-          {invitationButtion()}
+          <Space>
+            <Button type="primary" onClick={() => updateMode('edit')}>
+              Bewerken
+            </Button>
+            <Button type="primary" onClick={() => updateMode('delete')}>
+              Verwijderen
+            </Button>
+            {invitationButtion()}
+          </Space>
           <UserReadForm
             user={user}
           />

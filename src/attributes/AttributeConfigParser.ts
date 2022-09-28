@@ -1,6 +1,6 @@
 import {
   BooleanAttribute, CompoundTextAttribute, DateAttribute,
-  PhoneAttribute, TextAttribute, EmailAttribute,
+  PhoneAttribute, TextAttribute, EmailAttribute, TextAreaAttribute,
 } from './types';
 import { AttributeConfigDefinition, ConfigContext, AttributeTypes } from './AttributeConfigData';
 import AttributeInstance from './AttributeInstance';
@@ -66,6 +66,8 @@ export default class AttributeConfigParser {
           return EmailAttribute(attribute);
         case AttributeTypes.COMPOUND_TEXT:
           return CompoundTextAttribute(attribute);
+        case AttributeTypes.TEXTAREA:
+          return TextAreaAttribute(attribute);
         default:
           throw new Error();
       }

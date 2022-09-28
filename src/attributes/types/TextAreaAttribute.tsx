@@ -6,18 +6,22 @@ import { UserAttributes } from '../../adapters/users/UserAdapter';
 import AttributeInstance from '../AttributeInstance';
 import AttributeConfigData from '../AttributeConfigData';
 
+const { TextArea } = Input;
+
 export interface TextOptions {
   required: boolean,
   placeholder: string,
+  rows : number,
 }
 
-export default function TextAttribute({
+export default function TextAreaAttribute({
   name,
   attribute,
   description,
   options: {
     required,
     placeholder,
+    rows,
   },
 }: AttributeConfigData<TextOptions>): AttributeInstance<string> {
   return {
@@ -50,7 +54,7 @@ export default function TextAttribute({
         }]}
         tooltip={description ?? undefined}
       >
-        <Input placeholder={placeholder ?? undefined} style={{ width: '80%', marginRight: 8 }} />
+        <TextArea rows={rows ?? 1} placeholder={placeholder ?? undefined} style={{ width: '80%', marginRight: 8 }} />
       </Form.Item>
     ),
     menu: () => ({

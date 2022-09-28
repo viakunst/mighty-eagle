@@ -45,7 +45,7 @@ const AdminReadForm = (props:AdminReadProps) => {
   // Add delete, edit, cancel button.
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-      <Table dataSource={columnData} columns={columns} />
+      <Table dataSource={columnData} columns={columns} pagination={false} />
     </div>
   );
 };

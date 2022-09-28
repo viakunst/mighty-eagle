@@ -48,9 +48,9 @@ export default function ProfileEdit(props:UserAttributesProps) {
   const onFinish = async () => {
     const updatedUserAttributes = configInst.getAWSAttributes(form);
     const accessToken = userData.user?.access_token ?? OidcService.throwOnMissingAuth();
-
+    const { profile } = props;
     try {
-      await props.profile.updateUser(accessToken, updatedUserAttributes);
+      await profile.updateUser(accessToken, updatedUserAttributes);
       message.info('Account succesvol bijgewerkt.');
       onAttributesUpdate();
     } catch {
