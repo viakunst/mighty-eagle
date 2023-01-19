@@ -28,12 +28,9 @@ export default class AttributeConfigParser {
     }
     return data.flatMap((attribute) => {
       // validate keys
-      if (!valid(attribute, 'type', 'string')) { return []; }
-      if (!valid(attribute, 'name', 'string')) { return []; }
-      if (!valid(attribute, 'context', 'object')) { return []; }
-      if (!valid(attribute, 'attribute', 'string')) { return []; }
-      if (!valid(attribute, 'description', 'string', false)) { return []; }
-      if (!valid(attribute, 'options', 'object', false)) { return []; }
+      if (!this.validateKeys(attribute)) {
+        return [];
+      }
 
       // validate type
       if (!Object.values(AttributeTypes).includes(attribute.type)) { return []; }
@@ -48,6 +45,16 @@ export default class AttributeConfigParser {
       // validated
       return [attribute];
     });
+  }
+
+  static validateKeys(attribute: any): any {
+    if (!valid(attribute, 'type', 'string')) { return false; }
+    if (!valid(attribute, 'name', 'string')) { return false; }
+    if (!valid(attribute, 'context', 'object')) { return false; }
+    if (!valid(attribute, 'attribute', 'string')) { return false; }
+    if (!valid(attribute, 'description', 'string', false)) { return false; }
+    if (!valid(attribute, 'options', 'object', false)) { return false; }
+    return true;
   }
 
   static compile(data: AttributeConfigDefinition): AttributeInstance<any>[] {

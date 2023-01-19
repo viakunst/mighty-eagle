@@ -28,7 +28,8 @@ export default function Profile() {
   };
 
   const fetchUserData = async () => {
-    const accessToken = userData.user?.access_token ?? OidcService.throwOnMissingAuth();
+    const { user } = userData;
+    const accessToken = user?.access_token ?? OidcService.throwOnMissingAuth();
     return profile.getUser(accessToken);
   };
 

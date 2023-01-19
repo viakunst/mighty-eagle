@@ -56,34 +56,30 @@ export default class CognitoUserAdapter implements UserAdapter {
   }
 
   async resendInvitation(user: User) {
-    if (user.userAttributes !== null) {
-      if (user.userAttributes.email !== null) {
-        // Hard coded email field, but as in Cognito this field is required for all accounts.
-        // It should be acceptable.
-        const { email } = user.userAttributes;
+    if (user.userAttributes !== null && user.userAttributes.email !== null) {
+      // Hard coded email field, but as in Cognito this field is required for all accounts.
+      // It should be acceptable.
+      const { email } = user.userAttributes;
 
-        await CognitoService.client().send(new AdminCreateUserCommand({
-          DesiredDeliveryMediums: ['EMAIL'],
-          MessageAction: 'RESEND',
-          Username: email,
-          UserPoolId: this.userPoolId,
-        }));
-      }
+      await CognitoService.client().send(new AdminCreateUserCommand({
+        DesiredDeliveryMediums: ['EMAIL'],
+        MessageAction: 'RESEND',
+        Username: email,
+        UserPoolId: this.userPoolId,
+      }));
     }
   }
 
   async forcePasswordReset(user: User) {
-    if (user.userAttributes !== null) {
-      if (user.userAttributes.email !== null) {
-        // Hard coded email field, but as in Cognito this field is required for all accounts.
-        // It should be acceptable.
-        const { email } = user.userAttributes;
+    if (user.userAttributes !== null && user.userAttributes.email !== null) {
+      // Hard coded email field, but as in Cognito this field is required for all accounts.
+      // It should be acceptable.
+      const { email } = user.userAttributes;
 
-        await CognitoService.client().send(new AdminResetUserPasswordCommand({
-          Username: email,
-          UserPoolId: this.userPoolId,
-        }));
-      }
+      await CognitoService.client().send(new AdminResetUserPasswordCommand({
+        Username: email,
+        UserPoolId: this.userPoolId,
+      }));
     }
   }
 
