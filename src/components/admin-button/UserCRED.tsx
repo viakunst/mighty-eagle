@@ -8,7 +8,7 @@ interface UserAttributesProps {
   onAttributesUpdate: () => Promise<void>;
 }
 
-export default class UserCRED extends Component<{}, { mode:String, data:UserAttributesProps }> {
+export default class UserCRED extends Component<{}, { mode:string, data:UserAttributesProps }> {
   constructor(props:UserAttributesProps) {
     super(props);
     this.state = {
@@ -21,7 +21,7 @@ export default class UserCRED extends Component<{}, { mode:String, data:UserAttr
     // TO-DO: check if Cognito has his credentials.
   }
 
-  setMode(newMode:String) {
+  setMode(newMode:string) {
     this.setState({ mode: newMode });
   }
 

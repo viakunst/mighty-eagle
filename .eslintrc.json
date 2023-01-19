@@ -1,5 +1,16 @@
 {
+    "plugins": [
+        "import",
+        "react",
+        "react-hooks",
+        "@typescript-eslint",
+        "sonarjs"
+    ],
     "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "airbnb",
         "airbnb-typescript",
         "plugin:sonarjs/recommended"
     ],
@@ -7,7 +18,8 @@
         "project": "./tsconfig.json"
     },
     "rules": {
-        "react/jsx-one-expression-per-line": "off"
-    },
-    "plugins": ["sonarjs"]
+        "react/jsx-one-expression-per-line": "off",
+        "linebreak-style": 0,
+        "react/require-default-props": "off"
+    }
 }

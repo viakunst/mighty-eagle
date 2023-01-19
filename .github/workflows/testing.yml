@@ -30,8 +30,14 @@ jobs:
     - name: Install project dependencies
       run: yarn install
 
+    - name: Run frontend linter
+      run: yarn lint:quiet
+
     - name: Generate coverage reports
-      run: yarn test --coverage --silent --ci
+      run: yarn test:coverage
+
+    - name: Run static code analyser on frontend
+      run: yarn analyse
 
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
