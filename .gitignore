@@ -22,5 +22,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+src/config/attributeConfig.ts
 src/config/userManagerConfig.ts
 src/config/awsConfig.ts

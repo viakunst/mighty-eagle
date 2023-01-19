@@ -19,7 +19,6 @@
     },
     "rules": {
         "react/jsx-one-expression-per-line": "off",
-        "linebreak-style": 0,
-        "react/require-default-props": "off"
+        "linebreak-style": 0
     }
 }
