@@ -6,7 +6,7 @@ import { AttributeConfigDefinition, ConfigContext, AttributeTypes } from './Attr
 import AttributeInstance from './AttributeInstance';
 import ConfigAdapter from '../adapters/config/ConfigAdapter';
 
-function valid(object: any, key: string | number, type: string, required: boolean = true) {
+function valid(object: any, key: string | number, type: string, required = true) {
   if (key in object) {
     if (typeof object[key] !== type) return false;
   } else if (required) {
@@ -19,8 +19,7 @@ function valid(object: any, key: string | number, type: string, required: boolea
 
 export default class AttributeConfigParser {
   static parse(jsonConfig: any): AttributeConfigDefinition {
-    const attrs = this.validate(jsonConfig.config);
-    return attrs;
+    return this.validate(jsonConfig.config);
   }
 
   static validate(data: any): AttributeConfigDefinition {

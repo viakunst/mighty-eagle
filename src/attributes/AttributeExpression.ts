@@ -40,7 +40,7 @@ export default function AttributeExpression({
     expression,
     eval: (userData: UserAttributes) => {
       const splitExpr: ExpressionPart[] = getSplitExpression(expression, null);
-      let str: string = '';
+      let str = '';
       splitExpr.forEach((part) => {
         if (part.attribute != null) {
           if (userData[part.attribute] != null) {
@@ -59,7 +59,7 @@ export default function AttributeExpression({
     },
     evalFromForm: (form: FormInstance) => {
       const splitExpr: ExpressionPart[] = getSplitExpression(expression, null);
-      let str: string = '';
+      let str = '';
       splitExpr.forEach((part) => {
         if (part.attribute != null) {
           const value = form.getFieldValue(`attributes[${part.attribute}]`);
