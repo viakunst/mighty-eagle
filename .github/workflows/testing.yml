@@ -48,13 +48,6 @@ jobs:
     - name: Run static code analyser on frontend
       run: yarn analyse
 
-    - name: fix code coverage paths
-      working-directory: ./var/reports
-      run: |
-        sed -i 's/\/home\/runner\/work\/spicy-hamster\/spicy-hamster\//\/github\/workspace\//g' phpunit.xml
-        sed -i 's/\/home\/runner\/work\/spicy-hamster\/spicy-hamster\//\/github\/workspace\//g' phpunit.coverage.xml
-        sed -i 's/\/home\/runner\/work\/spicy-hamster\/spicy-hamster\//\/github\/workspace\//g' lcov.info
-
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       env:
