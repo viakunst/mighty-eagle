@@ -30,8 +30,8 @@ jobs:
     - name: Spoof the AWS config files
       run: |
         mv  ./src/config/awsConfig.sample.ts  ./src/config/awsConfig.ts
-        mv  ./src/config/config/userManagerConfig.sample.ts  ./src/config/userManagerConfig.ts 
-        mv  ./src/config/config/attributeConfig.sample.ts  ./src/config/attributeConfig.ts 
+        mv  ./src/config/userManagerConfig.sample.ts  ./src/config/userManagerConfig.ts 
+        mv  ./src/config/attributeConfig.sample.ts  ./src/config/attributeConfig.ts 
 
     - name: Clear JS dependencies cache
       run: yarn cache clean
