@@ -3,16 +3,14 @@
         "import",
         "react",
         "react-hooks",
-        "@typescript-eslint",
-        "sonarjs"
+        "@typescript-eslint"
     ],
     "extends": [
         "eslint:recommended",
         "plugin:react/recommended",
         "plugin:@typescript-eslint/recommended",
         "airbnb",
-        "airbnb-typescript",
-        "plugin:sonarjs/recommended"
+        "airbnb-typescript"
     ],
     "parserOptions": {
         "project": "./tsconfig.json"
