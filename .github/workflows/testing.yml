@@ -27,6 +27,15 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     
+    - name: Spoof the AWS config files
+      run: |
+        mv  ./src/config/awsConfig.sample.ts  ./src/config/awsConfig.ts
+        mv  ./src/config/config/userManagerConfig.sample.ts  ./src/config/userManagerConfig.ts 
+        mv  ./src/config/config/attributeConfig.sample.ts  ./src/config/attributeConfig.ts 
+
+    - name: Clear JS dependencies cache
+      run: yarn cache clean
+
     - name: Install project dependencies
       run: yarn install
 
@@ -38,6 +47,13 @@ jobs:
 
     - name: Run static code analyser on frontend
       run: yarn analyse
+
+    - name: fix code coverage paths
+      working-directory: ./var/reports
+      run: |
+        sed -i 's/\/home\/runner\/work\/spicy-hamster\/spicy-hamster\//\/github\/workspace\//g' phpunit.xml
+        sed -i 's/\/home\/runner\/work\/spicy-hamster\/spicy-hamster\//\/github\/workspace\//g' phpunit.coverage.xml
+        sed -i 's/\/home\/runner\/work\/spicy-hamster\/spicy-hamster\//\/github\/workspace\//g' lcov.info
 
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
