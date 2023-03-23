@@ -104,7 +104,7 @@ export default class CognitoUserAdapter implements UserAdapter {
   }
 
   async verifyEmail(username: string) {
-    console.log('verify');
+    console.log('verifyEmail');
     const awsAttributes = [{ Name: 'email_verified', Value: 'true' }];
     await CognitoService.client().send(new AdminUpdateUserAttributesCommand({
       UserPoolId: this.userPoolId,

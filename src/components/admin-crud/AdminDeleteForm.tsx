@@ -7,7 +7,7 @@ import {
 import UserAdapter, { User } from '../../adapters/users/UserAdapter';
 
 interface AdminDeleteProps {
-  userPool: UserAdapter;
+  userAdapter: UserAdapter;
   user: User;
   onAttributesUpdate: () => Promise<void>;
 }
@@ -27,14 +27,14 @@ const AdminDeleteForm = (props:AdminDeleteProps) => {
   const [form] = Form.useForm();
 
   const {
-    userPool, user, onAttributesUpdate,
+    userAdapter, user, onAttributesUpdate,
   } = props;
 
   const onFinish = async () => {
     const check = form.getFieldValue('sure');
     if (check === true) {
       try {
-        await userPool.deleteUser(user.username);
+        await userAdapter.deleteUser(user.username);
         message.info('Account succesvol verwijdert.');
         onAttributesUpdate();
       } catch {
