@@ -10,14 +10,14 @@ import Conditional from '../Conditional';
 import UserAdapter, { User } from '../../adapters/users/UserAdapter';
 
 interface UserDetailsProps {
-  userPool: UserAdapter;
+  userAdapter: UserAdapter;
   user: User | null;
   onAttributesUpdate: () => Promise<void>;
   modelTitleUpdate: (str: string) => void;
 }
 
 export default function UserDetails({
-  user, userPool, onAttributesUpdate, modelTitleUpdate,
+  user, userAdapter: userPool, onAttributesUpdate, modelTitleUpdate,
 }: UserDetailsProps) {
   const [mode, setMode] = useState('view');
 
@@ -89,7 +89,7 @@ export default function UserDetails({
     <>
       <Conditional isVisible={() => mode === 'create'}>
         <UserCreateForm
-          userPool={userPool}
+          userAdapter={userPool}
           onAttributesUpdate={onAttributesUpdate}
         />
       </Conditional>
@@ -114,7 +114,7 @@ export default function UserDetails({
             Annuleren
           </Button>
           <UserEditForm
-            userPool={userPool}
+            userAdapter={userPool}
             user={user}
             onAttributesUpdate={onAttributesUpdate}
           />

@@ -11,7 +11,7 @@ import AttributeConfigParser from '../../attributes/AttributeConfigParser';
 import { ConfigContext } from '../../attributes/AttributeConfigData';
 
 interface AdminUpdateProps {
-  userPool: UserAdapter;
+  userAdapter: UserAdapter;
   user: User;
   onAttributesUpdate: () => Promise<void>;
 }
@@ -31,7 +31,7 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
   const [form] = Form.useForm();
 
   const {
-    userPool, user, onAttributesUpdate,
+    userAdapter: userPool, user, onAttributesUpdate,
   } = props;
   const [configInst, setConfigInst] = useState(new AttributeConfig([]));
 

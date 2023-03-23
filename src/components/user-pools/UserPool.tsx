@@ -351,7 +351,7 @@ export function UserPool() {
         >
           { activeUserPool && (
             <UserDetails
-              userPool={activeUserPool}
+              userAdapter={activeUserPool}
               user={selectedUser}
               onAttributesUpdate={onAttributesUpdate}
               modelTitleUpdate={updateModalTitle}
