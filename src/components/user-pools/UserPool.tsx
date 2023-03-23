@@ -168,8 +168,7 @@ export function UserPool() {
             // escape values
             const escaped = row.map((val) => {
               let result = val.replace(/"/g, '""');
-              if (result.search(/['",\n\\]/g) >= 0)
-                  result = '"' + result + '"';
+              if (result.search(/['",\n\\]/g) >= 0) result = `"${result}"`;
               return result;
             });
             csv += `${escaped.join(',')}\n`;

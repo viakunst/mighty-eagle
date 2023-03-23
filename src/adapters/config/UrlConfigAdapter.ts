@@ -10,7 +10,7 @@ export default class LocalConfigAdapter implements ConfigAdapter {
 
   config?: AttributeConfigDefinition;
 
-  constructor(url: string, sameOrigin: boolean = true) {
+  constructor(url: string, sameOrigin = true) {
     this.url = url;
     this.sameOrigin = sameOrigin;
   }
