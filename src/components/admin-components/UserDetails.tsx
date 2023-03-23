@@ -17,7 +17,7 @@ interface UserDetailsProps {
 }
 
 export default function UserDetails({
-  user, userAdapter: userPool, onAttributesUpdate, modelTitleUpdate,
+  user, userAdapter, onAttributesUpdate, modelTitleUpdate,
 }: UserDetailsProps) {
   const [mode, setMode] = useState('view');
 
@@ -49,7 +49,7 @@ export default function UserDetails({
   const resendInvitation = async () => {
     if (user !== null) {
       try {
-        await userPool.resendInvitation(user);
+        await userAdapter.resendInvitation(user);
         message.info('Email verstuurt');
         onAttributesUpdate();
       } catch {
@@ -61,11 +61,11 @@ export default function UserDetails({
   const resetPassword = async () => {
     if (user !== null) {
       try {
-        await userPool.forcePasswordReset(user);
-        message.info('Email verstuurt');
+        await userAdapter.forcePasswordReset(user);
+        message.info('password gereset');
         onAttributesUpdate();
       } catch {
-        message.info('Probleem met het versturen van de uitnodiging.');
+        message.info('Probleem met het resetten van de uitnodiging.');
       }
     }
   };
@@ -89,7 +89,7 @@ export default function UserDetails({
     <>
       <Conditional isVisible={() => mode === 'create'}>
         <UserCreateForm
-          userAdapter={userPool}
+          userAdapter={userAdapter}
           onAttributesUpdate={onAttributesUpdate}
         />
       </Conditional>
@@ -114,7 +114,7 @@ export default function UserDetails({
             Annuleren
           </Button>
           <UserEditForm
-            userAdapter={userPool}
+            userAdapter={userAdapter}
             user={user}
             onAttributesUpdate={onAttributesUpdate}
           />
@@ -124,7 +124,7 @@ export default function UserDetails({
             Annuleren
           </Button>
           <UserDeleteForm
-            userPool={userPool}
+            userAdapter={userAdapter}
             user={user}
             onAttributesUpdate={onAttributesUpdate}
           />
