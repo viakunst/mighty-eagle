@@ -47,10 +47,12 @@ export default function ProfileEdit(props:UserAttributesProps) {
 
   const onFinish = async () => {
     const updatedUserAttributes = configInst.getAWSAttributes(form);
-    const accessToken = userData.user?.access_token ?? OidcService.throwOnMissingAuth();
+    const { user } = userData;
+    const accessToken = user?.access_token ?? OidcService.throwOnMissingAuth();
 
     try {
-      await props.profile.updateUser(accessToken, updatedUserAttributes);
+      const { profile } = props;
+      await profile.updateUser(accessToken, updatedUserAttributes);
       message.info('Account succesvol bijgewerkt.');
       onAttributesUpdate();
     } catch {
