@@ -56,7 +56,7 @@ export default function EmailAttribute({
         whitespace: false,
       },
       {
-        validator: (rule, input) => { validate(rule, input); },
+        validator: (rule, input) => validate(rule, input),
       }]}
       tooltip={description ?? undefined}
     >
