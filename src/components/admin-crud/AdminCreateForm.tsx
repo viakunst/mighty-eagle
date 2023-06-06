@@ -11,7 +11,7 @@ import { ConfigContext } from '../../attributes/AttributeConfigData';
 import AttributeConfig from '../../attributes/AttributeConfig';
 
 interface AdminCreateProps {
-  userPool: UserAdapter;
+  userAdapter: UserAdapter;
   onAttributesUpdate: () => Promise<void>;
 }
 
@@ -30,7 +30,7 @@ const AdminCreateForm = (props:AdminCreateProps) => {
   const [form] = Form.useForm();
 
   const {
-    userPool, onAttributesUpdate,
+    userAdapter, onAttributesUpdate,
   } = props;
 
   const [configInst, setConfigInst] = useState(new AttributeConfig([]));
@@ -48,7 +48,8 @@ const AdminCreateForm = (props:AdminCreateProps) => {
     // Email is the hardcoded username.
     const username = form.getFieldValue('attributes[email]');
     try {
-      await userPool.createUser(username, createUserAttributes);
+      await userAdapter.createUser(username, createUserAttributes);
+      await userAdapter.verifyEmail(username);
       message.info('Account succesvol aangemaakt.');
       onAttributesUpdate();
     } catch {

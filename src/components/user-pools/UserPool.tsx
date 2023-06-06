@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Divider, Modal, Select, Table, Input, Button,
+  Divider, Modal, Select, Table, Input, Button, Space,
 } from 'antd';
 
 import Icon from '@ant-design/icons';
@@ -277,7 +277,7 @@ export function UserPool() {
         >
           { searchConfigInst.configAttributes.map((att) => searchField(att.name, att.attribute))}
         </Select>
-        <Search placeholder="Zoek" allowClear onSearch={onSearch} style={{ width: 200 }} /> | {' '}
+        <Search placeholder="Zoek" allowClear onSearch={onSearch} style={{ width: 200 }} />
       </>
     );
   };
@@ -324,18 +324,20 @@ export function UserPool() {
 
         <div className="row">
           {poolSelector()}
-          {searchSelector()}
-          <Button type="primary" onClick={(e) => createUser(e.nativeEvent)}>
-            Maak account aan.
-          </Button> | {' '}
-          <Button onClick={(e) => exportData(e.nativeEvent)}>
-            Exporteer gebruikers
-          </Button> | {' '}
-          <Link to="/">
-            <Button>
-              Ga terug
+          {searchSelector()} {' '}
+          <Space>
+            <Button type="primary" onClick={(e) => createUser(e.nativeEvent)}>
+              Maak account aan.
             </Button>
-          </Link>
+            <Button onClick={(e) => exportData(e.nativeEvent)}>
+              Exporteer gebruikers
+            </Button>
+            <Link to="/">
+              <Button>
+                Ga terug
+              </Button>
+            </Link>
+          </Space>
         </div>
 
         <Table pagination={false} columns={columns} dataSource={users} />
@@ -343,12 +345,13 @@ export function UserPool() {
           title={modelTitle}
           destroyOnClose
           visible={userSelected}
+          width="60%"
           onCancel={closeModal}
           footer={null}
         >
           { activeUserPool && (
             <UserDetails
-              userPool={activeUserPool}
+              userAdapter={activeUserPool}
               user={selectedUser}
               onAttributesUpdate={onAttributesUpdate}
               modelTitleUpdate={updateModalTitle}

@@ -9,6 +9,11 @@ import TextAttribute, { TextOptions } from './TextAttribute';
 function isValidDate(dateString:string):boolean {
   // dd/mm/yyyy pattern.
 
+  // Empty date is valid.
+  if (dateString === undefined || dateString.length === 0) {
+    return true;
+  }
+
   // First check for the pattern
   if (!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) {
     return false;

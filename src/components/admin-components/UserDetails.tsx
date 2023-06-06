@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Button, message,
+  Button, message, Space,
 } from 'antd';
 import UserCreateForm from '../admin-crud/AdminCreateForm';
 import UserReadForm from '../admin-crud/AdminReadForm';
@@ -10,14 +10,14 @@ import Conditional from '../Conditional';
 import UserAdapter, { User } from '../../adapters/users/UserAdapter';
 
 interface UserDetailsProps {
-  userPool: UserAdapter;
+  userAdapter: UserAdapter;
   user: User | null;
   onAttributesUpdate: () => Promise<void>;
   modelTitleUpdate: (str: string) => void;
 }
 
 export default function UserDetails({
-  user, userPool, onAttributesUpdate, modelTitleUpdate,
+  user, userAdapter, onAttributesUpdate, modelTitleUpdate,
 }: UserDetailsProps) {
   const [mode, setMode] = useState('view');
 
@@ -49,7 +49,7 @@ export default function UserDetails({
   const resendInvitation = async () => {
     if (user !== null) {
       try {
-        await userPool.resendInvitation(user);
+        await userAdapter.resendInvitation(user);
         message.info('Email verstuurt');
         onAttributesUpdate();
       } catch {
@@ -61,11 +61,11 @@ export default function UserDetails({
   const resetPassword = async () => {
     if (user !== null) {
       try {
-        await userPool.forcePasswordReset(user);
-        message.info('Email verstuurt');
+        await userAdapter.forcePasswordReset(user);
+        message.info('password gereset');
         onAttributesUpdate();
       } catch {
-        message.info('Probleem met het versturen van de uitnodiging.');
+        message.info('Probleem met het resetten van de uitnodiging.');
       }
     }
   };
@@ -89,20 +89,22 @@ export default function UserDetails({
     <>
       <Conditional isVisible={() => mode === 'create'}>
         <UserCreateForm
-          userPool={userPool}
+          userAdapter={userAdapter}
           onAttributesUpdate={onAttributesUpdate}
         />
       </Conditional>
       { user && (
       <>
         <Conditional isVisible={() => mode === 'view'}>
-          <Button type="primary" onClick={() => updateMode('edit')}>
-            Bewerken
-          </Button> | {' '}
-          <Button type="primary" onClick={() => updateMode('delete')}>
-            Verwijderen
-          </Button>
-          {invitationButtion()}
+          <Space>
+            <Button type="primary" onClick={() => updateMode('edit')}>
+              Bewerken
+            </Button>
+            <Button type="primary" onClick={() => updateMode('delete')}>
+              Verwijderen
+            </Button>
+            {invitationButtion()}
+          </Space>
           <UserReadForm
             user={user}
           />
@@ -112,7 +114,7 @@ export default function UserDetails({
             Annuleren
           </Button>
           <UserEditForm
-            userPool={userPool}
+            userAdapter={userAdapter}
             user={user}
             onAttributesUpdate={onAttributesUpdate}
           />
@@ -122,7 +124,7 @@ export default function UserDetails({
             Annuleren
           </Button>
           <UserDeleteForm
-            userPool={userPool}
+            userAdapter={userAdapter}
             user={user}
             onAttributesUpdate={onAttributesUpdate}
           />

@@ -11,7 +11,7 @@ import AttributeConfigParser from '../../attributes/AttributeConfigParser';
 import { ConfigContext } from '../../attributes/AttributeConfigData';
 
 interface AdminUpdateProps {
-  userPool: UserAdapter;
+  userAdapter: UserAdapter;
   user: User;
   onAttributesUpdate: () => Promise<void>;
 }
@@ -31,7 +31,7 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
   const [form] = Form.useForm();
 
   const {
-    userPool, user, onAttributesUpdate,
+    userAdapter, user, onAttributesUpdate,
   } = props;
   const [configInst, setConfigInst] = useState(new AttributeConfig([]));
 
@@ -46,7 +46,8 @@ const AdminUpdateForm = (props:AdminUpdateProps) => {
     const userAttributes = configInst.getAWSAttributes(form);
     console.log(userAttributes);
     try {
-      await userPool.updateUser(user.username, userAttributes);
+      await userAdapter.updateUser(user.username, userAttributes);
+      await userAdapter.verifyEmail(user.username);
       message.info('Account succesvol bijgewerkt.');
       onAttributesUpdate();
     } catch {

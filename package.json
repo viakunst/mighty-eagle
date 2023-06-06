@@ -15,7 +15,7 @@
     "@types/react": "^17.0.5",
     "@types/react-dom": "^17.0.5",
     "@types/react-router-dom": "^5.1.7",
-    "antd": "^4.16.13",
+    "antd": "4.23.3",
     "aws-sdk": "^2.988.0",
     "formik": "^2.2.6",
     "lodash": "^4.17.21",

@@ -26,8 +26,6 @@ export default function App() {
                   // placeholder
                 }
 
-                console.log('succes');
-
                 // Instantly identify the user in the identity pool and request credentials.
                 OidcService.saveIdToken(user.id_token);
                 CognitoService.signIn(user.id_token);

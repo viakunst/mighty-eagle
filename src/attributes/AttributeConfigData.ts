@@ -22,6 +22,7 @@ export enum ConfigContext {
 export enum AttributeTypes {
   EMAIL = 'email',
   TEXT = 'string',
+  TEXTAREA = 'textarea',
   CHECKBOX = 'boolean',
   DATE = 'date',
   PHONE = 'phone',
